@@ -7,14 +7,11 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
-    lowercase: true, // Stores as lowercase
-    match: [/^\S+@\S+\.\S+$/, 'Please provide a valid email']
+    unique: true
   },
   password: {
     type: String,
-    required: true,
-    select: false // Excludes password by default from queries for security
+    required: true
   },
   address: {
     type: String
