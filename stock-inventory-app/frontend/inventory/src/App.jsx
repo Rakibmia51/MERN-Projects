@@ -1,17 +1,27 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import {BrowserRouter as Router, Routes, Route} from 'react-router'
 import './App.css'
+import Root from './utils/Root'
+import Login from './pages/Login'
+import ProtectedRoutes from './utils/ProtectedRoutes'
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  
 
   return (
     <>
-      <div className="text-3xl font-bold underline text-red-500">
-        Stock Inventory App
-      </div>
+      <Router>
+        <Routes>
+          <Route path='/' element={<Root/>}/>
+          <Route path='/admin/dashboard' element={
+              <ProtectedRoutes requireRole={["admin"]}>
+                <h1>Admin Dashboard</h1>
+              </ProtectedRoutes>}/>
+          <Route path='/customer/dashboard' element={<h1>Customer Dashboard</h1>}/>
+          <Route path='/login' element={<Login/>}/>
+           <Route path='/unauthorized' element={<p className='font-bold text-3xl mt-20 ml-20'>unauthorized</p>}/>
+        </Routes>
+      </Router>
     </>
   )
 }
