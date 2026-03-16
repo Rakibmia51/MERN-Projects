@@ -27,7 +27,7 @@ const Login = () => {
         await login(response.data.user, response.data.token);
 
         if (response.data.user.role === "admin") {
-          navigate("/admin/dashboard");
+          navigate("/admin-dashboard");
         } else {
           navigate("/customer/dashboard");
         }
@@ -49,8 +49,8 @@ const Login = () => {
     <div className="flex flex-col items-center h-screen justify-center 
     bg-gradient-to-b from-blue-600 from-50% to-gray-100 to-50% space-y-6">
 
-      <h2 className="text-3xl text-white">
-        Inventory Management System
+      <h2 className="text-3xl text-white text-center">
+        Global Skill Force Development & Research Center
       </h2>
 
       <form
