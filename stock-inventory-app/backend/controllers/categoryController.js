@@ -46,7 +46,7 @@ const updateCategory = async (req, res) => {
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
       { categoryName, categoryDescription },
-      { new: true }
+      { returnDocument: "after" }
     );
 
     if (!updatedCategory) {
