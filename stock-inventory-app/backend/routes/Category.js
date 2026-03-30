@@ -6,8 +6,8 @@ const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 
 router.post("/add",authMiddleware, addCategory);
-router.get("/", getCategories);
-router.put("/update/:id", updateCategory)
-router.delete("/delete/:id", deleteCategory)
+router.get("/",authMiddleware, getCategories);
+router.put("/update/:id",authMiddleware, updateCategory)
+router.delete("/delete/:id",authMiddleware, deleteCategory)
 
 module.exports = router;
