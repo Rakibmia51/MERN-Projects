@@ -5,6 +5,7 @@ import Login from './pages/Login'
 import ProtectedRoutes from './utils/ProtectedRoutes'
 import Dashboard from './pages/Dashboard'
 import Categories from './components/Categories'
+import Suppliers from './components/Suppliers'
 
 
 function App() {
@@ -34,7 +35,7 @@ function App() {
               />
                <Route
                 path='suppliers'
-                element={<h1>Suppliers</h1>}
+                element={<Suppliers/>}
               />
                <Route
                 path='orders'

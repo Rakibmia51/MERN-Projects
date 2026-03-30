@@ -148,16 +148,18 @@ const Categories = () => {
                         <input 
                             type="text" 
                             placeholder='Categories Name' 
-                            className='border w-full p-2 rounded-md'
+                            className='border border-gray-300 w-full p-2 rounded-md'
                             value={categoryName}
+                            required
                             onChange={(e)=>setCategoryName(e.target.value)}
                             />
                     </div>
                         <div>
-                            <input 
+                            <textarea 
                                 type="text" 
                                 placeholder='Categories Description' 
-                                className='border border w-full p-2 rounded-md'
+                                className='border border-gray-300 w-full p-2 rounded-md'
+                                required
                                 value={categoryDescription}
                                 onChange={(e)=>setCategoryDescription(e.target.value)}
                                 />
