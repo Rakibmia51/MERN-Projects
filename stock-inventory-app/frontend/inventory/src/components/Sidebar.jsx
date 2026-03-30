@@ -12,7 +12,7 @@ const menuItems = [
     {name:"Orders", path: "/admin-dashboard/orders", icon: <FaShoppingCart/>, isParent: false},
     {name:"Users", path: "/admin-dashboard/users", icon: <FaUser/>, isParent: false},
     {name:"Profile", path: "/admin-dashboard/profile", icon: <FaCog/>, isParent: false},
-    {name:"Logout", path: "/logout", icon: <FaSignOutAlt/>, isParent: false}
+    {name:"Logout", path: "/admin-dashboard/logout", icon: <FaSignOutAlt/>, isParent: false}
 ]
 
 return (

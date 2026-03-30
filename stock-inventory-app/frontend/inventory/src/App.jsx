@@ -6,6 +6,8 @@ import ProtectedRoutes from './utils/ProtectedRoutes'
 import Dashboard from './pages/Dashboard'
 import Categories from './components/Categories'
 import Suppliers from './components/Suppliers'
+import  Products  from './components/Products'
+import Logout from './components/Logout'
 
 
 function App() {
@@ -31,7 +33,7 @@ function App() {
               />
                <Route
                 path='products'
-                element={<h1>Products</h1>}
+                element={<Products/>}
               />
                <Route
                 path='suppliers'
@@ -48,6 +50,10 @@ function App() {
                <Route
                 path='profile'
                 element={<h1>Profile</h1>}
+              />
+              <Route
+                path='logout'
+                element={<Logout/>}
               />
       
           </Route>

@@ -86,8 +86,8 @@ const Suppliers = () => {
                 }
             }
             } catch (error) {
-                console.error("Error Adding Supplier:", error)
-                alert("Error adding Supplier. Please try again.")
+                console.error("Error Supplier:", error)
+                alert("Error  Supplier. Please try again.")
             }
     }
 
@@ -105,7 +105,6 @@ const Suppliers = () => {
         );
 
         setSuppliers(response.data.suppliers);
-        setFilteredSuppliers(response.data.suppliers)
 
     } catch (error) {
         console.error("Error fetching suppliers:", error);
