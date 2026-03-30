@@ -168,7 +168,7 @@ const Categories = () => {
                         <div className='flex space-x-2'>
                              <button 
                                 type='submit'
-                                className='w-full mt-2 rounded-md bg-green-500 text-white p-3 cursor-pointer hover:bg-green-600 font-bold'
+                                className='w-full mt-2 rounded-md bg-blue-500 text-white p-3 cursor-pointer hover:bg-blue-600 font-bold'
                                 >
                                {editCategory ? "Save Changes" : " Add Categories"}
                             </button>
