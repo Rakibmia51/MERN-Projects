@@ -17,6 +17,7 @@ const productsSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  isDeleted:{type: Boolean, default: false},
   categoryId:{type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true},
   supplierId:{type: mongoose.Schema.Types.ObjectId, ref: "Supplier", required: true}
 }, { timestamps: true });

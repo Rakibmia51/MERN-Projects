@@ -82,7 +82,7 @@ const deleteSupplier = async (req, res)=>{
         if (!existingSupplier) {
         return res.status(404).json({
             success: false,
-            message: "Category not found",
+            message: "Supplier not found",
         });
         }
 
