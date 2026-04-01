@@ -6,6 +6,8 @@ const authRoutes = require('./routes/auth')
 const categoryRoutes = require('./routes/Category')
 const supplierRoutes = require('./routes/Supplier')
 const productsRoutes = require('./routes/Products')
+const usersRoutes = require('./routes/user')
+
 
 require('dotenv').config();
 
@@ -24,6 +26,7 @@ app.use('/api/auth',authRoutes)
 app.use('/api/category',categoryRoutes)
 app.use('/api/supplier',supplierRoutes)
 app.use('/api/products',productsRoutes)
+app.use('/api/users',usersRoutes)
 
 app.listen(port, () => {
 

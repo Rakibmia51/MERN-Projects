@@ -8,6 +8,7 @@ import Categories from './components/Categories'
 import Suppliers from './components/Suppliers'
 import  Products  from './components/Products'
 import Logout from './components/Logout'
+import Users from './components/Users'
 
 
 function App() {
@@ -45,7 +46,7 @@ function App() {
               />
                <Route
                 path='users'
-                element={<h1>Users</h1>}
+                element={<Users/>}
               />
                <Route
                 path='profile'
