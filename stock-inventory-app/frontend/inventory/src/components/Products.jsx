@@ -192,7 +192,7 @@ const Products = () => {
         </div>
 
        {loading ? <div>Loading....</div> :(
-             <div>
+        <div>
             <table className='w-full border-collapse border border-gray-300 mt-4'>
                 <thead>
                     <tr className='bg-gray-200'>
