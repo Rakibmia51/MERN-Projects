@@ -8,11 +8,21 @@ const CustomerProducts = () => {
     const [categories, setCategories] = useState([])
     const [products, setProducts] = useState([])
     const [searchTerm, setSearchTerm] = useState("")
+    const [selectedCategory, setSelectedCategory] = useState("")
+    const [loading, setLoading] = useState(true)
+    const [openModal, setOpenModal] = useState(false)
+    const [orderData, setOrderData] = useState({
+        productId:"",
+        quantity: 1,
+        total : 0,
+        stock:0,
+        price: 0
+    })
 
-      const fetchProducts = async ()=>{
+    const fetchProducts = async ()=>{
         try {
             
-                // setLoading(true);
+                setLoading(true);
                 const response = await axios.get(
                 "http://localhost:3000/api/products",
                 {
@@ -31,18 +41,90 @@ const CustomerProducts = () => {
         } catch (error) {
             console.error("Error fetching Products:", error);
         }finally {
-        // setLoading(false); // ✅ এক জায়গায় handle
+        setLoading(false); // ✅ এক জায়গায় handle
         } 
     }
     useEffect(()=>{
         fetchProducts();
     },[])
 
-    const filteredProducts = products.filter((product) =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const filteredProducts = products.filter((product) => {
+
+        // Search Filter
+        const matchesSearch =  product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.categoryId.categoryName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         product.supplierId.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    
+        // Category Filter
+        const matchesCategory =
+        selectedCategory === "" || product.categoryId?._id === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+    
+    });
+
+    const closeModal = ()=>{
+        setOpenModal(false)
+
+    }
+
+    const handleOrderChange = (product)=>{
+        setOrderData({
+            productId: product._id,
+            quantity: 1,
+            total: product.price,
+            stock: product.stock,
+            price: product.price
+        })
+        setOpenModal(true)
+    }
+
+    const handleSubmit = async (e) =>{
+          e.preventDefault();
+
+          try {
+              const response = await axios.post(
+                    "http://localhost:3000/api/order/add",
+                    orderData,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
+                        },
+                    }
+                    )
+                    if(response.data.success){
+                        alert("Order Place successfully!")
+                        setOpenModal(false)
+                        setOrderData({
+                            productId: "",
+                            quantity: 1,
+                            total: 0,
+                            stock: 0,
+                            price: 0
+                        })
+                        fetchProducts()
+                    }else{
+                        console.error("Error Add Order Data:", response.data)
+
+                        alert("Error Add Order Data. Please try again")
+                    }
+          } catch (error) {
+              console.error('Error adding Order', error)
+                res.status(500).json({success: false, message: 'Server Error adding Order'})
+          }
+    }
+
+    const increaseQuantity = (e)=>{
+        if(e.target.value > orderData.stock){
+            alert("Not enougth stock")
+        }else{
+            setOrderData((prev)=>({
+                ...prev,
+                quantity: parseInt(e.target.value),
+                total: parseInt(e.target.value) * parseInt(orderData.price)
+            }))
+        }
+    }
 
   return (
     <div className='w-full h-full flex flex-col gap-4 p-4'>
@@ -53,7 +135,16 @@ const CustomerProducts = () => {
         </div>
         <div className='py-4 px-6 flex justify-between items-center'>
             <div>
-                select
+                <select name='category' id='' className='bg-white border p-1 rounded'
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}>
+                    <option value="">Selct Category</option>
+                    {categories && categories.map((cat, index)=>(
+                        <option key={cat._id} value={cat._id}>
+                            {cat.categoryName}
+                        </option>
+                    ))}
+                </select>
             </div>
             <div>
                 <input type="text" 
@@ -65,6 +156,7 @@ const CustomerProducts = () => {
             </div>
         </div>
 
+        {loading ? <div>Loading....</div> :(
         <div>
             <table className='w-full border-collapse border border-gray-300 mt-4'>
                 <thead>
@@ -98,7 +190,9 @@ const CustomerProducts = () => {
                           
                             <td className='border border-gray-300 p-2'>
                                     <button className='bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mr-2'
-                                    // onClick={() => handleEdit(product)}
+                                    onClick={() => {
+                                        handleOrderChange(product)
+                                    }}
                                     >Order</button>
                             </td>
                         </tr>
@@ -107,6 +201,57 @@ const CustomerProducts = () => {
             </table>
             {filteredProducts.length === 0 && <div>No Records</div>}
         </div>
+        )}
+
+        {openModal && (
+            <div className="fixed inset-0 bg-black/50 flex justify-center items-center">
+                <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg relative">
+                    <h2 className="text-xl font-bold mb-4">
+                         {/* {editProducts ? "Edit Product" : "Add Product"} */}
+                         Place Order
+                    </h2>
+                    <button className='absolute top-4 right-4 font-bold text-lg cursor-pointer '
+                    onClick={closeModal}
+                    >X</button>
+                    <form  className="space-y-4" 
+                    onSubmit={handleSubmit}
+                    >
+                        <input
+                        type="number"
+                        min="1"
+                        name='quantity'
+                        value={orderData.quantity}
+                        onChange={increaseQuantity}
+                        className="w-full border p-2 rounded"
+                        placeholder="Increase Order Quantity."
+                        required
+                        />
+
+                        <p>Total : {orderData.quantity * orderData.price}</p>
+
+                        <div className="flex justify-end gap-2">
+                            <button
+                                type="button"
+                                className="bg-gray-400 text-white px-4 py-2 rounded cursor-pointer"
+                                onClick={closeModal}
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                className="bg-green-500 text-white px-4 py-2 rounded"
+                            >
+                                {/* {editProducts ? "Save Changes" : "Add Product"} */}
+                                Order Submit
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+        )}
+       
     </div>
   )
 }
