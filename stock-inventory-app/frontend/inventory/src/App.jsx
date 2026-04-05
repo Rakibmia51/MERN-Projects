@@ -10,6 +10,7 @@ import  Products  from './components/Products'
 import Logout from './components/Logout'
 import Users from './components/Users'
 import CustomerProducts from './components/CustomerProducts'
+import Orders from './components/Orders'
 
 
 function App() {
@@ -60,9 +61,21 @@ function App() {
 
           <Route 
             path='/customer-dashboard' 
-            element={<Dashboard/>}
-          >
-            <Route index element={<CustomerProducts/>}></Route>
+            element={
+               <ProtectedRoutes requireRole={["customer"]}>
+                <Dashboard/>
+              </ProtectedRoutes>
+            }>
+
+            <Route 
+              index 
+              element={<CustomerProducts/>}
+            />
+            <Route
+              path='orders'
+              element={<Orders/>}
+            />
+            
           </Route>
 
           <Route path='/login' element={<Login/>}/>
