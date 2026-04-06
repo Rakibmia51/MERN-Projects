@@ -7,7 +7,7 @@ const { addOrder, getOrders } = require("../controllers/orderController");
 const router = express.Router();
 
 router.post("/add",authMiddleware, addOrder);
-router.get("/", getOrders);
+router.get("/",authMiddleware, getOrders);
 // router.put("/update/:id",authMiddleware, updateCategory)
 // router.delete("/delete/:id",authMiddleware, deleteCategory)
 

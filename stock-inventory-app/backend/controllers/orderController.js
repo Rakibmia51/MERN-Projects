@@ -39,9 +39,9 @@ const getOrders = async (req, res)=>{
     try {
         const userId = req.user._id;
         const orders = await Order.find({customer: userId}).populate({path: 'product', populate: {
-            path: 'category',
+            path: 'categoryId',
             select: 'categoryName',
-        }, select: 'name price'}).populate('user', 'name email')
+        }, select: 'name price'}).populate('customer', 'name email')
         return res.status(200).json({success: true, orders})
     } catch (error) {
          console.error('Error get Order', error)
