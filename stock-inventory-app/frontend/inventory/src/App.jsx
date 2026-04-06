@@ -11,6 +11,7 @@ import Logout from './components/Logout'
 import Users from './components/Users'
 import CustomerProducts from './components/CustomerProducts'
 import Orders from './components/Orders'
+import Profile from './components/Profile'
 
 
 function App() {
@@ -51,7 +52,7 @@ function App() {
               />
                <Route
                 path='profile'
-                element={<h1>Profile</h1>}
+                element={<Profile/>}
               />
               <Route
                 path='logout'
@@ -74,6 +75,14 @@ function App() {
             <Route
               path='orders'
               element={<Orders/>}
+            />
+             <Route
+                path='profile'
+                element={<Profile/>}
+              />
+            <Route
+              path='logout'
+              element={<Logout/>}
             />
             
           </Route>

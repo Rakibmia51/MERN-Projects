@@ -69,4 +69,47 @@ const deleteUser = async (req, res)=>{
   }
 }
 
-module.exports = {addUser, getUsers, deleteUser}
+const getProfile = async(req, res)=>{
+    try {
+        const userId = req.user._id;
+
+        const user = await User.findById(userId).select('-password')
+        if(!user){
+            return res.status(404).json({success: false, message: 'User not found'})
+        }
+        return res.status(200).json({success: true, user})
+    } catch (error) {
+        console.error("Get User profile Error:", error);
+        res.status(500).json({
+        success: false,
+        message: "Error get User profile",
+        });
+    }
+}
+
+const updateUserProfile = async(req, res)=>{
+    try {
+        const userId = req.user._id;
+        const {name, email, address, password} = req.body;
+
+        const updatedata = {name, email, address};
+        if(password && password.trim() !==''){
+            const hashedPassword = await bcrypt.hash(password, 10);
+            updatedata.password = hashedPassword;
+        }
+
+        const user = await User.findByIdAndUpdate(userId, updatedata,{ returnDocument: "after" }).select('-password')
+        if(!user){
+            return res.status(404).json({success: false, message: 'User not found'})
+        }
+        return res.status(200).json({success: true, message: 'Profile Updated Successfully', user})
+    } catch (error) {
+        console.error("Update User profile Error:", error);
+        res.status(500).json({
+        success: false,
+        message: "Error Update User profile",
+        });
+    }
+}
+
+module.exports = {addUser, getUsers, deleteUser, getProfile, updateUserProfile}
