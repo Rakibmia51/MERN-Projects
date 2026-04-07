@@ -12,6 +12,7 @@ import Users from './components/Users'
 import CustomerProducts from './components/CustomerProducts'
 import Orders from './components/Orders'
 import Profile from './components/Profile'
+import Summary from './components/Summary'
 
 
 function App() {
@@ -28,7 +29,7 @@ function App() {
               
               <Route
                 index
-                element={<h1>Summary of Dashboard</h1>}
+                element={<Summary/>}
               />
                <Route
                 path='categories'
@@ -44,7 +45,7 @@ function App() {
               />
                <Route
                 path='orders'
-                element={<h1>Orders</h1>}
+                element={<Orders/>}
               />
                <Route
                 path='users'
