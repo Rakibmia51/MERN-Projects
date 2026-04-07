@@ -8,7 +8,7 @@ const supplierRoutes = require('./routes/Supplier')
 const productsRoutes = require('./routes/Products')
 const usersRoutes = require('./routes/user')
 const orderRoutes = require('./routes/order')
-
+const dashboardRoutes = require('./routes/dashboard')
 
 require('dotenv').config();
 
@@ -29,7 +29,7 @@ app.use('/api/supplier',supplierRoutes)
 app.use('/api/products',productsRoutes)
 app.use('/api/users',usersRoutes)
 app.use('/api/order',orderRoutes)
-
+app.use('/api/dashboard',dashboardRoutes)
 
 app.listen(port, () => {
 
