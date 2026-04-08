@@ -1,5 +1,5 @@
 const Category = require("../models/Category")
-
+const Products = require("../models/Products")
 
 const addCategory = async(req, res)=>{
     try {
@@ -76,6 +76,13 @@ const deleteCategory = async (req, res)=>{
     try {
         const {id} = req.params;
 
+        const productCount = await Products.countDocuments({categoryId: id})
+        if(productCount > 0){
+          return res.status(404).json({
+            success: false,
+            message: "Can not Delete category associated with products",
+          });
+        }
         // check if the category exists
         const existingCategory = await Category.findById(id);
 
