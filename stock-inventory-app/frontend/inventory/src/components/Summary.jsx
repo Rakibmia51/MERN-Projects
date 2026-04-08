@@ -73,7 +73,7 @@ if(loading){
                             {dashboardData.outStock.map((product, index)=>(
                                 <li key={index} className='text-gray-600'>
                                     {product.name} {" "}
-                                    <span className='text-gray-400'>({product.category.name})</span>
+                                    <span className='text-gray-400'>({product.categoryId.categoryName})</span>
                                 </li>
                             ))}
                         </ul>

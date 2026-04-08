@@ -125,7 +125,11 @@ const Categories = () => {
 
             } catch (error) {
                 console.error("Delete Error:", error.response?.data || error.message);
-                alert("Error deleting category");
+                if(error.response){
+                    alert(error.response.data.message)
+                }else{
+                    alert("Error deleting category");
+                } 
             }
         }
 

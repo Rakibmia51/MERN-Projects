@@ -1,3 +1,4 @@
+const ProductModal = require("../models/Products")
 const supplierModal = require("../models/Supplier")
 
 
@@ -76,6 +77,13 @@ const deleteSupplier = async (req, res)=>{
     try {
         const {id} = req.params;
 
+        const productCount = await ProductModal.countDocuments({supplierId: id})
+        if(productCount > 0){
+          return res.status(404).json({
+            success: false,
+            message: "Can not Delete Supplier associated with products",
+          });
+        }
         // check if the category exists
         const existingSupplier = await supplierModal.findById(id);
 

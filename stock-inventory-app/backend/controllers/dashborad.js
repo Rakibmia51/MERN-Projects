@@ -26,7 +26,7 @@ const getData = async (req, res)=>{
         ])
         const revenue = revenueResult[0]?.totalRevenue || 0;
 
-        const outOfStock = await Product.find({stock: 0})
+        const outStock = await Product.find({stock: 0})
         .select('name stock')
         .populate('categoryId', 'categoryName')
 
@@ -78,7 +78,7 @@ const getData = async (req, res)=>{
             totalStock,
             ordersToday,
             revenue,
-            outOfStock,
+            outStock,
             highesSaleProduct,
             lowStock
         }
