@@ -42,7 +42,7 @@ const Suppliers = () => {
             if(editSupplier){
             // ✅ UPDATE
                 const response = await axios.put(
-                    `http://localhost:3000/api/supplier/update/${editSupplier}`,
+                    `https://api.wsfrc.com/api/supplier/update/${editSupplier}`,
                     formData,
                     {
                         headers: {
@@ -60,7 +60,7 @@ const Suppliers = () => {
 
             } else {
                 const response = await axios.post(
-                "http://localhost:3000/api/supplier/add",
+                "https://api.wsfrc.com/api/supplier/add",
                 formData,
                 {
                     headers: {
@@ -96,7 +96,7 @@ const Suppliers = () => {
         setLoading(true);
 
         const response = await axios.get(
-        "http://localhost:3000/api/supplier",
+        "https://api.wsfrc.com/api/supplier",
         {
             headers: {
             Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
@@ -136,7 +136,7 @@ const Suppliers = () => {
         if (confirmDelete) {
                 try {
                 const response = await axios.delete(
-                `http://localhost:3000/api/supplier/delete/${id}`,
+                `https://api.wsfrc.com/api/supplier/delete/${id}`,
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,

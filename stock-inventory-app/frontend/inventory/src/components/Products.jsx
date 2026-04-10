@@ -25,7 +25,7 @@ const Products = () => {
             
                 setLoading(true);
                 const response = await axios.get(
-                "http://localhost:3000/api/products",
+                "https://api.wsfrc.com/api/products",
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
@@ -63,7 +63,7 @@ const Products = () => {
             if(editProducts){
                  // ✅ UPDATE
                 const response = await axios.put(
-                    `http://localhost:3000/api/products/update/${editProducts}`,
+                    `https://api.wsfrc.com/api/products/update/${editProducts}`,
                     formData,
                     {
                         headers: {
@@ -80,7 +80,7 @@ const Products = () => {
                 }
             }else{
                     const response = await axios.post(
-                    "http://localhost:3000/api/products/add",
+                    "https://api.wsfrc.com/api/products/add",
                     formData,
                     {
                         headers: {
@@ -143,7 +143,7 @@ const Products = () => {
         if (confirmDelete) {
                 try {
                 const response = await axios.delete(
-                `http://localhost:3000/api/products/delete/${id}`,
+                `https://api.wsfrc.com/api/products/delete/${id}`,
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,

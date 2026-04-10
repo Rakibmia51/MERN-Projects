@@ -13,7 +13,7 @@ const Profile = () => {
     const fetchUser = async ()=>{
         try {
                 const response = await axios.get(
-                "http://localhost:3000/api/users/profile",
+                "https://api.wsfrc.com/api/users/profile",
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
@@ -42,7 +42,7 @@ const Profile = () => {
         e.preventDefault();
          try {
                 const response = await axios.put(
-                "http://localhost:3000/api/users/profile",user,
+                "https://api.wsfrc.com/api/users/profile",user,
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
