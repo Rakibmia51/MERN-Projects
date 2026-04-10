@@ -20,7 +20,7 @@ const Users = () => {
         setLoading(true);
 
         const response = await axios.get(
-        "http://localhost:3000/api/users",
+        "https://api.wsfrc.com/api/users",
         {
             headers: {
             Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
@@ -51,7 +51,7 @@ const Users = () => {
     const handleSubmit = async (e) =>{
         e.preventDefault()
         const response = await axios.post(
-        "http://localhost:3000/api/users/add",
+        "https://api.wsfrc.com/api/users/add",
         formData,
         {
             headers: {
@@ -81,7 +81,7 @@ const Users = () => {
         if (confirmDelete) {
                 try {
                 const response = await axios.delete(
-                `http://localhost:3000/api/users/delete/${id}`,
+                `https://api.wsfrc.com/api/users/delete/${id}`,
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,

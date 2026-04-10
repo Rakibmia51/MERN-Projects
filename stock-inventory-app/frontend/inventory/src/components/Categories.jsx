@@ -16,7 +16,7 @@ const Categories = () => {
         setLoading(true);
 
         const response = await axios.get(
-        "http://localhost:3000/api/category",
+        "https://api.wsfrc.com/api/category",
         {
             headers: {
             Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
@@ -43,7 +43,7 @@ const Categories = () => {
 
         if(editCategory){
             const response = await axios.put(
-            `http://localhost:3000/api/category/update/${editCategory}`,
+            `https://api.wsfrc.com/api/category/update/${editCategory}`,
             {categoryName, categoryDescription},
             {
                 headers: {
@@ -65,7 +65,7 @@ const Categories = () => {
             }
         }else{
             const response = await axios.post(
-            "http://localhost:3000/api/category/add",
+            "https://api.wsfrc.com/api/category/add",
             {categoryName, categoryDescription},
             {
                 headers: {
@@ -107,7 +107,7 @@ const Categories = () => {
         if (confirmDelete) {
                 try {
                 const response = await axios.delete(
-                `http://localhost:3000/api/category/delete/${id}`,
+                `https://api.wsfrc.com/api/category/delete/${id}`,
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,

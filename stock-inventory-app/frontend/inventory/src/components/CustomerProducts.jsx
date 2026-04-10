@@ -24,7 +24,7 @@ const CustomerProducts = () => {
             
                 setLoading(true);
                 const response = await axios.get(
-                "http://localhost:3000/api/products",
+                "https://api.wsfrc.com/api/products",
                 {
                     headers: {
                     Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
@@ -84,7 +84,7 @@ const CustomerProducts = () => {
 
           try {
               const response = await axios.post(
-                    "http://localhost:3000/api/order/add",
+                    "https://api.wsfrc.com/api/order/add",
                     orderData,
                     {
                         headers: {

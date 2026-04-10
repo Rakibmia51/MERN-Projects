@@ -10,7 +10,7 @@ const Orders = () => {
               
                   setLoading(true);
                   const response = await axios.get(
-                  "http://localhost:3000/api/order",
+                  "https://api.wsfrc.com/api/order",
                   {
                       headers: {
                       Authorization: `Bearer ${localStorage.getItem("pos-token")}`,
