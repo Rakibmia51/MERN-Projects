@@ -12,9 +12,9 @@ const seedAdmin = async ()=>{
         const password = await bcrypt.hash("123456", 10)
 
         await User.create({
-            fullName: "Ariful Islam",
+            fullName: "admin",
             mobile: "01712345678", // Matches your BD regex
-            email: "ariful.islam@example.com",
+            email: "admin@example.com",
             nid: "1234567890123",
             dateOfBirth: new Date("1995-05-15"),
 
