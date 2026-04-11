@@ -5,6 +5,7 @@ import Root from './utils/Root'
 import Login from './pages/Login'
 import ProtectedRoutes from './utils/ProtectedRoutes'
 import Dashboard from './pages/Dashboard'
+import MemberList from './components/Members'
 
 function App() {
   
@@ -34,7 +35,7 @@ function App() {
                  <Route
                   path='members'
                   element={
-                    <h1>Add Members</h1>
+                    <MemberList/>
                   }
                 />
                  <Route
