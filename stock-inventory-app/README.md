@@ -15,9 +15,11 @@
         - user model
         - user seeder file
         - login api
-
+        
+    - Frontend
         - react-router
         - context api
         - root
         - front-end
         - protected route
+        - Build admin sidebar
