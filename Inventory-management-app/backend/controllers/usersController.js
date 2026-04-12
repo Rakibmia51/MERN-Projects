@@ -164,7 +164,46 @@ const updateUser = async (req, res) => {
     }
 };
 
+const statusUpdate = async (req, res)=>{
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // ভ্যালিডেশন: শুধুমাত্র active বা inactive এলাউড
+        if (!['active', 'inactive'].includes(status)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Invalid status value" 
+            });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id, 
+            { status: status }, 
+            {returnDocument: 'after'} // আপডেট হওয়া ডাটাটি রিটার্ন করবে
+        );
+
+        if (!updatedUser) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "User not found" 
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: `User is now ${status}`,
+            user: updatedUser
+        });
+
+    } catch (error) {
+        console.error("Status Update Error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error" 
+        });
+    }
+}
 
 
-
-module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser}
+module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser, statusUpdate}
