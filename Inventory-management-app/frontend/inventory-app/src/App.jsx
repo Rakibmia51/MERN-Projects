@@ -5,7 +5,7 @@ import Root from './utils/Root'
 import Login from './pages/Login'
 import ProtectedRoutes from './utils/ProtectedRoutes'
 import Dashboard from './pages/Dashboard'
-import MemberList from './components/Members'
+import MemberList from './components/MemberList'
 
 function App() {
   

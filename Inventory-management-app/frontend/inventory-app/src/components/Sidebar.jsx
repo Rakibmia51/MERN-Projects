@@ -136,7 +136,7 @@ const Sidebar = () => {
 
                 <div className="p-8 border-t border-white/5">
                      <p className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-                        Powered by <span className="text-blue-500">Rakib mia</span>
+                        Powered by NextBarta <span className="text-blue-500">Rakib mia</span>
                      </p>
                 </div>
             </aside>
