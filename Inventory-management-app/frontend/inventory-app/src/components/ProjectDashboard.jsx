@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import {LayoutGrid, Activity, DollarSign, TrendingUp, Edit, Trash2, Search, X, Briefcase, PieChart, Calendar, Currency  } from 'lucide-react';
+import {TrendingDown, Landmark, Wallet, Eye,LayoutGrid, Activity, DollarSign, TrendingUp, Edit, Trash2, Search, X, Briefcase, PieChart, Calendar, Currency  } from 'lucide-react';
 import Swal from 'sweetalert2'; // ডিলিট কনফার্মেশনের জন্য 
+import { useNavigate } from 'react-router-dom';
 
 
 // --- MAIN PROJECT LIST COMPONENT ---
@@ -22,6 +23,11 @@ const ProjectList = () => {
     notes: ''
   });
   const [editId, setEditId] = useState(null); // Track project being edited
+
+
+
+
+
 
   const fetchProjects = async () => {
     try {
@@ -151,6 +157,7 @@ const ProjectList = () => {
         onDelete={handleDelete} 
         setIsModalOpen={setIsModalOpen}
         onEdit={handleEditClick}
+     
       />
       {/* --- ADD and Update PROJECT MODAL --- */}
       {isModalOpen && (
@@ -205,6 +212,8 @@ const ProjectList = () => {
                       value={formData.status} onChange={(e) => setFormData({...formData, status: e.target.value})}>
                       <option value="Pending">Pending</option>
                       <option value="Active">Active</option>
+                      <option value="On Hold">On Hold</option>
+                      <option value="Closed">Closed</option>
                     </select>
                   </div>
                 </div>
@@ -214,6 +223,13 @@ const ProjectList = () => {
                   <textarea required placeholder="Briefly describe the project objectives..." className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-slate-50/50" rows="3"
                     value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}></textarea>
                 </div>
+
+                 <div className="space-y-1.5">
+                  <label className="text-sm font-semibold text-slate-700">Notes</label>
+                  <textarea required placeholder="Briefly Notes the project..." className="w-full border border-slate-200 rounded-xl px-4 py-3 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 bg-slate-50/50" rows="2"
+                    value={formData.notes} onChange={(e) => setFormData({...formData, notes: e.target.value})}></textarea>
+                </div>
+
 
                 <div className="flex justify-end gap-3 pt-4 border-t border-slate-50">
                   <button type="button" onClick={() => {closeModal(false); setIsModalOpen(false)}} className="px-6 py-3 text-slate-600 font-bold hover:bg-slate-50 rounded-xl transition-all">Discard</button>
@@ -225,6 +241,7 @@ const ProjectList = () => {
           </div>
         )}
 
+    
         
     </>
        
@@ -242,7 +259,8 @@ const ProjectDashboard = ({
       setSearchQuery, 
       onDelete,
       setIsModalOpen,
-      onEdit 
+      onEdit,
+      // onView 
     
     }
     ) => {
@@ -250,6 +268,8 @@ const ProjectDashboard = ({
         const totalInvestment = projects.reduce((sum, p) => sum + (p.initialInvestment || 0), 0);
         const netProfit = projects.reduce((sum, p) => sum + ((p.currentValue || 0) - (p.initialInvestment || 0)), 0);
 
+
+         const navigate = useNavigate();
         return (
         
           <div className="p-6 bg-gray-50 min-h-screen">
@@ -341,12 +361,27 @@ const ProjectDashboard = ({
                         </td>
                         <td className="px-6 py-4 text-center">
                           <div className="flex justify-center space-x-2">
-                            <button className="p-2 hover:bg-blue-100 text-blue-600 rounded-full transition"
+
+                             {/* Table-er bitore View Button projectCode /admin-dashboard/projects/:id*/}
+                            <button 
+                               onClick={() => navigate(`/admin-dashboard/projects/${project._id}`)}  
+                                className="group relative flex items-center gap-2 bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-lg hover:bg-emerald-600 hover:text-white transition-all duration-300 border border-emerald-100 hover:shadow-lg hover:shadow-emerald-100"
+                                title="View Details"
+                            >
+                                <div className="relative">
+                                    <Eye size={16} className="group-hover:scale-110 transition-transform duration-300" />
+                                    {/* আইকনের উপরে একটি ছোট পালস ডট যা হোভার করলে দেখা যাবে */}
+                                    <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-400 rounded-full opacity-0 group-hover:opacity-100 animate-ping"></span>
+                                </div>
+                                
+                            </button>
+
+                            <button title="Edit" className="p-2.5 text-blue-600 hover:bg-blue-600 hover:text-white rounded-xl transition-all border border-blue-50 hover:shadow-lg hover:shadow-blue-100"
                               onClick={()=> onEdit(project)}
                             >
                               <Edit size={16}/>
                             </button>
-                            <button className="p-2 hover:bg-red-100 text-red-600 rounded-full transition"
+                            <button  title="Delete" className="p-2.5 text-red-600 hover:bg-red-600 hover:text-white rounded-xl transition-all border border-red-50 hover:shadow-lg hover:shadow-red-100"
                               onClick={() => onDelete(project._id)}
                             >
                               <Trash2 size={16}/>
@@ -392,5 +427,18 @@ const calculateROI = (p) => {
   if (!p.currentValue || p.initialInvestment === 0) return 0;
   return (((p.currentValue - p.initialInvestment) / p.initialInvestment) * 100).toFixed(1);
 };
+
+// --- DETAIL CARD COMPONENT ---
+const DetailCard = ({ title, value, icon }) => (
+  <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+    <div className="p-3 bg-slate-50 rounded-2xl">
+      {icon}
+    </div>
+    <div>
+      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{title}</p>
+      <p className="text-lg font-black text-slate-800">৳{value?.toLocaleString() || 0}</p>
+    </div>
+  </div>
+);
 
 export default ProjectList;

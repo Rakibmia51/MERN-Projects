@@ -7,6 +7,7 @@ import ProtectedRoutes from './utils/ProtectedRoutes'
 import Dashboard from './pages/Dashboard'
 import MemberList from './components/MemberList'
 import ProjectDashboard from './components/ProjectDashboard'
+import ProjectDetails from './components/ProjectDetails'
 
 function App() {
   
@@ -57,6 +58,15 @@ function App() {
                     <ProjectDashboard/>
                   }
                 />
+
+                {/* আইডি অনুযায়ী পেজ */}
+                <Route 
+                  path="projects/:id" 
+                  element={<ProjectDetails />}
+                  
+                /> 
+
+
                 <Route
                   path='shares'
                   element={
