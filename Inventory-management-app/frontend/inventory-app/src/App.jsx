@@ -6,6 +6,7 @@ import Login from './pages/Login'
 import ProtectedRoutes from './utils/ProtectedRoutes'
 import Dashboard from './pages/Dashboard'
 import MemberList from './components/MemberList'
+import ProjectDashboard from './components/ProjectDashboard'
 
 function App() {
   
@@ -53,7 +54,7 @@ function App() {
                  <Route
                   path='projects'
                   element={
-                    <h1>Projects</h1>
+                    <ProjectDashboard/>
                   }
                 />
                 <Route
