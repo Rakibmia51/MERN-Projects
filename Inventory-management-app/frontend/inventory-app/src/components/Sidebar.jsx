@@ -27,7 +27,7 @@ const Sidebar = () => {
                 // { name: "Subscription Fees", path: "/admin-dashboard/fees", icon: <FaMoneyCheckAlt /> },
                 { name: "Projects", path: "/admin-dashboard/projects", icon: <FaProjectDiagram /> },
                 { name: "Shares", path: "/admin-dashboard/shares", icon: <FaChartPie /> },
-                { name: "Share Sales", path: "/admin-dashboard/share-sales", icon: <HandCoins /> },
+                { name: "Share Sales", path: "/admin-dashboard/share-sales", icon: <HandCoins size={15}/> },
                 { name: "Endpoints", path: "/admin-dashboard/endpoints", icon: <FaCogs /> },
                 { name: "Profile Management", path: "/admin-dashboard/profiles", icon: <FaUserCog /> },
                 { name: "Reports", path: "/admin-dashboard/reports", icon: <FaFileAlt /> },

@@ -1,3 +1,4 @@
+const Projects = require('../models/project');
 const ShareIssue = require('../models/shareIssue');
 
 
@@ -102,4 +103,30 @@ const deleteShareIssue = async (req, res) => {
 };
 
 
-module.exports ={createShareIssue, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue}
+const getLatestPrice = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        
+        // প্রজেক্ট আইডি দিয়ে ডাটাবেস থেকে সবশেষ ইস্যু করা শেয়ারটি খুঁজে বের করা
+        const latestIssue = await ShareIssue.findOne({ projectId: projectId })
+            .sort({ createdAt: -1 }); // সবশেষটি পাওয়ার জন্য সর্ট করা
+
+        if (latestIssue) {
+           
+                res.json({ 
+                    success: true, 
+                    price: latestIssue.pricePerShare, 
+                    // আপনার ডাটাবেসে ফিল্ডের নাম totalQuantity
+                    availableShares: latestIssue.totalQuantity, 
+                    issueId: latestIssue._id 
+                });
+        } else {
+            res.status(404).json({ success: false, message: "No stock found" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+
+module.exports ={createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue}

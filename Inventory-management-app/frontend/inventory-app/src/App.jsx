@@ -9,6 +9,7 @@ import MemberList from './components/MemberList'
 import ProjectDashboard from './components/ProjectDashboard'
 import ProjectDetails from './components/ProjectDetails'
 import ShareIssueList from './components/ShareIssueList'
+import ProjectWithShares from './components/ShareSalesList'
 
 
 function App() {
@@ -78,7 +79,7 @@ function App() {
                  <Route
                   path='share-sales'
                   element={
-                   <h1>Share-Sales</h1>
+                   <ProjectWithShares/>
                   }
                 />
                 <Route

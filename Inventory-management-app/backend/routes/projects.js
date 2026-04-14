@@ -7,7 +7,7 @@ const { createProject, getProjects, getProject, deleteProject, updateProject } =
 const router = express.Router();
 
 router.post("/create",authMiddleware, createProject);
-router.get("/", authMiddleware, getProjects);
+router.get("/", getProjects);
 router.get("/:id", authMiddleware, getProject);
 
 router.delete("/delete/:id", authMiddleware, deleteProject);
