@@ -1,7 +1,7 @@
 const express = require('express');
 
 const authMiddleware = require('../middleware/authMiddleware');
-const { createShareIssue, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue } = require('../controllers/shareIssueController');
+const { createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue } = require('../controllers/shareIssueController');
 
 
 
@@ -13,6 +13,8 @@ router.get("/:id", singleShareIssue);
 
 router.delete("/delete/:id", deleteShareIssue);
 router.put("/update/:id", updateShareIssue);
+
+router.get("/latest-price/:projectId",getLatestPrice )
 
 
 

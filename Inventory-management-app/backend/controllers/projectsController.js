@@ -1,4 +1,5 @@
 const Projects = require("../models/project");
+const ShareIssue = require("../models/shareIssue");
 
 const createProject =async(req, res)=>{
 
@@ -34,7 +35,16 @@ const createProject =async(req, res)=>{
 const getProjects =async(req, res)=>{
     try {
         const projects = await Projects.find().sort({ createdAt: -1 });
-        return res.status(200).json({success:true, projects})
+
+        const shareIssue = await ShareIssue.find()
+                    .populate('projectId', 'totalQuantity pricePerShare totalValue')
+                    .sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success:true, 
+            projects,
+            shareIssue
+        })
     } catch (error) {
        return res.status(500).json({success: false, message: error.message})
     }

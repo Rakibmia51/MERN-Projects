@@ -221,5 +221,22 @@ const statusUpdate = async (req, res)=>{
     }
 }
 
+const memberSearch = async (req, res) => {
+    try {
+        const { code } = req.params;
+        // ডাটাবেসে memberId বা নির্দিষ্ট কোড দিয়ে সার্চ করা
+        const member = await User.findOne({ memberCode: code }); 
 
-module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser, statusUpdate}
+        if (member) {
+            return res.json({ success: true, member });
+        } else {
+            return res.status(404).json({ success: false, message: "Member not found" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+};
+
+
+
+module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser, statusUpdate, memberSearch}

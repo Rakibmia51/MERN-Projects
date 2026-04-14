@@ -6,7 +6,7 @@ const { createShareSale, getAllShareSales} = require('../controllers/shareSaleCo
 
 const router = express.Router();
 
-router.post("/create", createShareSale);
+router.post("/create",authMiddleware, createShareSale);
 router.get("/", getAllShareSales);
 
 
