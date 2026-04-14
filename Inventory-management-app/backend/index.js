@@ -5,8 +5,8 @@ const cors = require('cors')
 const authRoutes = require('./routes/auth')
 const usersRoutes = require('./routes/users')
 const projectsRoutes = require('./routes/projects')
-
-
+const sharesRoutes = require('./routes/ShareIssue')
+const shareSalesRoutes = require('./routes/shareSales')
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -16,8 +16,8 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/users', usersRoutes)
 app.use('/api/projects', projectsRoutes)
-
-
+app.use('/api/shares', sharesRoutes)
+app.use('/api/share-sales', shareSalesRoutes)
 
 
 

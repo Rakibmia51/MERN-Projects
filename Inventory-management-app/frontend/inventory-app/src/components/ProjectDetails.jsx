@@ -57,13 +57,14 @@ const ProjectDetails = () => {
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <CompactCard title="Initial Investment" value={project.initialInvestment} color="text-slate-600" />
           <CompactCard title="Share Value" value={project.shareValue} color="text-indigo-600" />
-          <CompactCard title="Total Income" value={project.totalIncome} color="text-emerald-600" highlight />
-          <CompactCard title="Current Value" value={project.currentValue} color="text-blue-600" />
-          <CompactCard title="Total Expenses" value={project.expenses} color="text-rose-600" />
           <div className="bg-white p-4 rounded-xl border border-slate-200 flex flex-col justify-center items-center">
             <p className="text-[9px] font-black text-slate-400 uppercase">ROI Performance</p>
             <h3 className={`text-lg font-black ${roi >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{roi}%</h3>
           </div>
+          <CompactCard title="Total Income" value={project.totalIncome} color="text-emerald-600" highlight />
+          <CompactCard title="Total Expenses" value={project.expenses} color="text-rose-600" />
+          <CompactCard title="Current Value" value={project.currentValue} color="text-blue-600" />
+         
         </div>
 
         {/* Bottom Section: Description & Notes */}

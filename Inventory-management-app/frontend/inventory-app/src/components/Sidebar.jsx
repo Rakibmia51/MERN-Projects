@@ -1,3 +1,4 @@
+import { HandCoins } from 'lucide-react';
 import React, { useState } from 'react'
 import { 
   FaHome,FaSignOutAlt , FaUserCircle, FaUsers, FaBook, FaMoneyCheckAlt, FaChevronDown, FaChevronRight, 
@@ -23,9 +24,10 @@ const Sidebar = () => {
             children: [
                 { name: "Members", path: "/admin-dashboard/members", icon: <FaUsers /> },
                 { name: "Ledger", path: "/admin-dashboard/ledger", icon: <FaBook /> },
-                { name: "Subscription Fees", path: "/admin-dashboard/fees", icon: <FaMoneyCheckAlt /> },
+                // { name: "Subscription Fees", path: "/admin-dashboard/fees", icon: <FaMoneyCheckAlt /> },
                 { name: "Projects", path: "/admin-dashboard/projects", icon: <FaProjectDiagram /> },
                 { name: "Shares", path: "/admin-dashboard/shares", icon: <FaChartPie /> },
+                { name: "Share Sales", path: "/admin-dashboard/share-sales", icon: <HandCoins /> },
                 { name: "Endpoints", path: "/admin-dashboard/endpoints", icon: <FaCogs /> },
                 { name: "Profile Management", path: "/admin-dashboard/profiles", icon: <FaUserCog /> },
                 { name: "Reports", path: "/admin-dashboard/reports", icon: <FaFileAlt /> },

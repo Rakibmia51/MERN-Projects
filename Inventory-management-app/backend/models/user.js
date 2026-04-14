@@ -1,6 +1,11 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
+    memberCode: { 
+    type: String, 
+    unique: true, 
+    uppercase: true 
+    },
     fullName: { type: String, required: true, trim: true },
     mobile: { 
         type: String, 
