@@ -88,6 +88,7 @@ const MemberList = () => {
         const status = member.status || 'active';
         const matchesTab = status.toLowerCase() === activeTab;
         const matchesSearch = 
+            member.memberCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
             member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
             member.mobile.includes(searchTerm) ||
             member.email?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -134,6 +135,7 @@ const MemberList = () => {
                         <thead className="bg-gray-50/50 text-gray-400 uppercase text-[11px] font-bold tracking-[0.1em]">
                             <tr>
                                 <th className="px-6 py-5">SL</th>
+                                <th className="px-6 py-5">Member Code</th>
                                 <th className="px-6 py-5">Member Identity</th>
                                 <th className="px-6 py-5">Contact Details</th>
                                 <th className="px-6 py-5 text-center">Status Action</th>
@@ -144,8 +146,8 @@ const MemberList = () => {
                             {filteredMembers.length > 0 ? (
                                 filteredMembers.map((member, index) => (
                                     <tr key={member._id} className="hover:bg-blue-50/20 transition-colors group">
-                                        <td className="px-6 py-4 text-xs font-bold text-gray-300">#{index + 1}</td>
-                                        
+                                        <td className="px-6 py-4 text-xs font-bold text-gray-500">#{index + 1}</td>
+                                        <td  className="px-6 py-4 font-medium text-blue-600">{member.memberCode}</td> 
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
                                                 <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-100 uppercase">

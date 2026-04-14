@@ -8,6 +8,8 @@ import Dashboard from './pages/Dashboard'
 import MemberList from './components/MemberList'
 import ProjectDashboard from './components/ProjectDashboard'
 import ProjectDetails from './components/ProjectDetails'
+import ShareIssueList from './components/ShareIssueList'
+
 
 function App() {
   
@@ -46,12 +48,12 @@ function App() {
                     <h1>Ledger</h1>
                   }
                 />
-                 <Route
+                 {/* <Route
                   path='fees'
                   element={
                     <h1>Subscription Fees</h1>
                   }
-                />
+                /> */}
                  <Route
                   path='projects'
                   element={
@@ -70,7 +72,13 @@ function App() {
                 <Route
                   path='shares'
                   element={
-                    <h1>Shares</h1>
+                    <ShareIssueList/>
+                  }
+                />
+                 <Route
+                  path='share-sales'
+                  element={
+                   <h1>Share-Sales</h1>
                   }
                 />
                 <Route

@@ -31,6 +31,21 @@ const addUser =async(req, res)=>{
                 remarks
                 } = req.body;
 
+
+                // মেম্বার রেজিস্ট্রেশন ফাংশনের ভেতরে
+                const lastUser = await User.findOne().sort({ createdAt: -1 });
+                let nextNumber = 1;
+
+                if (lastUser && lastUser.memberCode) {
+                    // MEM-000001 থেকে নম্বরটি আলাদা করা
+                    const lastNum = parseInt(lastUser.memberCode.split('-')[1]);
+                    nextNumber = lastNum + 1;
+                }
+
+                // নম্বরটিকে ৪ ডিজিটের ফরম্যাটে রূপান্তর করা
+                const formattedCode = `MEM-${nextNumber.toString().padStart(6, '0')}`;
+
+
                 // Check if the User already exists
                 const existsUser = await User.findOne({email})
                 if(existsUser){
@@ -40,6 +55,7 @@ const addUser =async(req, res)=>{
                 const hashedPassword = await bcrypt.hash(password, 10)
                 // Create a new user
                 const newUser = new User({
+                    memberCode: formattedCode,
                     fullName,
                     mobile,
                     email,

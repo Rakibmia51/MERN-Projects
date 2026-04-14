@@ -68,7 +68,9 @@ const MemberDetailsModal = ({ isOpen, onClose, member }) => {
                             <h3 className="text-blue-600 font-black text-[11px] uppercase tracking-widest border-b pb-1 flex items-center gap-2">
                                 <Phone size={12}/> Identity & Contact
                             </h3>
+                            
                             <div className="grid grid-cols-1 gap-3">
+                                <DataRow label="Member Code" value={member.memberCode} />
                                 <DataRow label="Full Name" value={member.fullName} />
                                 <DataRow label="Phone Number" value={member.mobile} />
                                 <DataRow label="Email Address" value={member.email} />
