@@ -4,14 +4,23 @@ const ShareIssue = require('../models/shareIssue');
 // শেয়ার সেল ক্রিয়েট করা
 const createShareSale = async (req, res) => {
     try {
-        const { projectId, quantity, issueId } = req.body;
-         // ১. আগে চেক করুন শেয়ার স্টকে আছে কি না
+        const { projectId, quantity, issueId, pricePerShare } = req.body;
+
+        // ১. এভেইলেবল শেয়ার চেক (totalQuantity - soldQuantity)
         const issue = await ShareIssue.findById(issueId);
-        if (!issue || issue.totalQuantity < quantity) {
-            return res.status(400).json({ success: false, message: "Not enough shares available!" });
+        if (!issue) {
+            return res.status(404).json({ success: false, message: "Share Issue not found!" });
         }
 
-        // 2. অটো সেল নম্বর জেনারেট করা (SLS-0001)
+        const available = issue.totalQuantity - (issue.soldQuantity || 0);
+        if (available < quantity) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `যথেষ্ট শেয়ার নেই! বর্তমানে ${available} টি শেয়ার বিক্রির জন্য আছে।` 
+            });
+        }
+
+        // ২. অটো সেল নম্বর জেনারেট করা
         const lastSale = await ShareSale.findOne().sort({ createdAt: -1 });
         let nextNumber = 1;
         if (lastSale?.saleNumber) {
@@ -19,26 +28,32 @@ const createShareSale = async (req, res) => {
         }
         const formattedNumber = `SLS-${nextNumber.toString().padStart(4, '0')}`;
 
-        // 3. নতুন সেল তৈরি (Total Amount ব্যাকএন্ডেও ডাবল চেক করা হচ্ছে)
+        // ৩. নতুন সেল তৈরি
         const newSale = new ShareSale({
             ...req.body,
             saleNumber: formattedNumber,
-           totalAmount: Number(quantity) * Number(req.body.pricePerShare),
-            soldBy: req.user.id // এটি অটোমেটিক আপনার 'auth' মিডলওয়্যার থেকে আসবে
+            totalAmount: Number(quantity) * Number(pricePerShare),
+            soldBy: req.user.id 
         });
 
-        // ৪. [গুরুত্বপূর্ণ] ShareIssue থেকে কোয়ান্টিটি কমিয়ে দিন
-        // এটিই আপনার স্টক আপডেট করবে
+        // ৪. [গুরুত্বপূর্ণ পরিবর্তন] totalQuantity কমবে না, soldQuantity বাড়বে
         await ShareIssue.findByIdAndUpdate(issueId, {
-            $inc: { totalQuantity: -Number(quantity) }
+            $inc: { soldQuantity: Number(quantity) }
         });
 
         await newSale.save();
-        res.status(201).json({ success: true, message: "Share sale recorded successfully", data: newSale });
+        res.status(201).json({ 
+            success: true, 
+            message: "Share sale recorded successfully", 
+            data: newSale 
+        });
+
     } catch (error) {
+        console.error(error); // সার্ভার এরর চেক করার জন্য
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 const getAllShareSales = async (req, res) => {
     try {
