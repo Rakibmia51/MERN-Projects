@@ -101,7 +101,7 @@ const ShareSales = () => {
       if (res.data.success) {
         Swal.fire('Success', 'বিক্রি সম্পন্ন হয়েছে', 'success');
         setIsModalOpen(false);
-        setFormData({ projectId: '', issueId: '', memberId: '', buyerName: '', userId: '', quantity: '', pricePerShare: 0, totalAmount: 0, paymentMethod: 'Cash' });
+        setFormData({ projectId: '', issueId: '', memberId: '', buyerName: '', userId: '', quantity: '', pricePerShare: 0, totalAmount: 0, availableShares: 0, paymentMethod: 'Cash' });
         fetchData();
       }
     } catch (err) { Swal.fire('Error', 'সার্ভারে সমস্যা হয়েছে', 'error'); }
@@ -197,7 +197,7 @@ const ShareSales = () => {
 
         {/* Create Sale Modal */}
         {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-in fade-in duration-300">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center z-60 p-4 animate-in fade-in duration-300">
             <div className="bg-white rounded-[2.5rem] shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] w-full max-w-2xl overflow-hidden border border-slate-100">
             
             {/* Header */}

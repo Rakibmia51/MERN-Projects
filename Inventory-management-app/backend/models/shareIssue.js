@@ -7,6 +7,7 @@ const shareIssueSchema = new mongoose.Schema({
   totalQuantity: { type: Number, required: true },
   pricePerShare: { type: Number, required: true },
   totalValue: { type: Number, required: true },
+  soldQuantity: { type: Number },
   notes: { type: String }
 }, { timestamps: true });
 

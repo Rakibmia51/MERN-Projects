@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Edit, Trash2, UserPlus, Users, UserX, CheckCircle, XCircle, Search, Mail, Phone } from 'lucide-react';
+import { Edit, Trash2, UserPlus, Users, UserX, CheckCircle, XCircle, Search, Mail, Phone, Eye } from 'lucide-react';
 import Swal from 'sweetalert2'; 
 import AddMemberModal from './AddMemberModal';
-import { Eye } from 'lucide-react'; // Eye icon import korun
+
 import MemberDetailsModal from './MemberDetailsModal';
 
 
@@ -85,15 +85,20 @@ const MemberList = () => {
 
 
     const filteredMembers = members.filter(member => {
-        const status = member.status || 'active';
-        const matchesTab = status.toLowerCase() === activeTab;
-        const matchesSearch = 
-            member.memberCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            member.mobile.includes(searchTerm) ||
-            member.email?.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesTab && matchesSearch;
-    });
+    // status না থাকলে 'active' ধরে নিবে
+    const status = member.status || 'active';
+    const matchesTab = status.toLowerCase() === activeTab;
+
+    // প্রতিটি ফিল্ড চেক করে দেখা হচ্ছে সেগুলো আছে কি না (Optional chaining '?.' ব্যবহার করে)
+    const matchesSearch = 
+        (member.memberCode?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+        (member.fullName?.toLowerCase().includes(searchTerm.toLowerCase()) || false) || 
+        (member.mobile?.includes(searchTerm) || false) ||
+        (member.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false);
+
+    return matchesTab && matchesSearch;
+});
+
 
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-screen font-sans">

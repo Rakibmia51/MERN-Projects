@@ -107,19 +107,22 @@ const getLatestPrice = async (req, res) => {
     try {
         const { projectId } = req.params;
         
-        // প্রজেক্ট আইডি দিয়ে ডাটাবেস থেকে সবশেষ ইস্যু করা শেয়ারটি খুঁজে বের করা
         const latestIssue = await ShareIssue.findOne({ projectId: projectId })
-            .sort({ createdAt: -1 }); // সবশেষটি পাওয়ার জন্য সর্ট করা
+            .sort({ createdAt: -1 });
 
         if (latestIssue) {
+            // ক্যালকুলেশন: মোট শেয়ার থেকে বিক্রি হওয়া শেয়ার বাদ দিন
+            const available = latestIssue.totalQuantity - (latestIssue.soldQuantity || 0);
            
-                res.json({ 
-                    success: true, 
-                    price: latestIssue.pricePerShare, 
-                    // আপনার ডাটাবেসে ফিল্ডের নাম totalQuantity
-                    availableShares: latestIssue.totalQuantity, 
-                    issueId: latestIssue._id 
-                });
+            res.json({ 
+                success: true, 
+                totalQuantity: latestIssue.totalQuantity,
+                price: latestIssue.pricePerShare, 
+                totalValue: latestIssue.totalValue,
+                soldQuantity: latestIssue.soldQuantity,
+                availableShares: available, // এখন এটি আপডেট করা সংখ্যা পাঠাবে
+                issueId: latestIssue._id 
+            });
         } else {
             res.status(404).json({ success: false, message: "No stock found" });
         }
@@ -127,6 +130,7 @@ const getLatestPrice = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
 
 
 module.exports ={createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue}
