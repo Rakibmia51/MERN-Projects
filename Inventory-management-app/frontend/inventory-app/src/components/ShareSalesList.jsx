@@ -5,6 +5,8 @@ import {
   ShoppingCart, Search, Plus, X, BadgeDollarSign, Wallet, Layers, TrendingUp, 
   UserCheck, Briefcase, Eye, FileText, Download, Landmark, Smartphone, Banknote, ChevronDown 
 } from 'lucide-react';
+import InvoicePage from './InvoicePage';
+import html2pdf from 'html2pdf.js';
 
 const ShareSales = () => {
   const [sales, setSales] = useState([]);
@@ -12,7 +14,9 @@ const ShareSales = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
+  const [selectedSale, setSelectedSale] = useState(null); // ইনভয়েসের জন্য ডেটা হোল্ড করবে
+   
+
   const [formData, setFormData] = useState({
     projectId: '', issueId: '', memberId: '', buyerName: '',
     userId: '', quantity: '', availableShares: 0, pricePerShare: 0, totalAmount: 0,
@@ -107,6 +111,93 @@ const ShareSales = () => {
     } catch (err) { Swal.fire('Error', 'সার্ভারে সমস্যা হয়েছে', 'error'); }
   };
 
+  
+  // For Invoice Print
+  if (selectedSale) {
+    return <InvoicePage sale={selectedSale} onBack={() => setSelectedSale(null)} />;
+  }
+
+  // ডাউনলোড ফাংশন 
+  const handleDownloadPDF = (sale) => {
+    // ১. একটি টেমপ্লেট তৈরি করা (যা স্ক্রিনে দেখা যাবে না)
+    const element = document.createElement('div');
+    element.innerHTML = `
+      <div style="width: 210mm; padding: 40px; font-family: sans-serif; color: #333;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #065f46; padding-bottom: 20px; margin-bottom: 30px;">
+          <div>
+            <h1 style="color: #10b981; margin: 0; font-size: 24px;">INVESTMENT RECEIPT</h1>
+            <p style="color: #666; margin: 5px 0;">Voucher: <b>${sale.saleNumber}</b></p>
+          </div>
+          <div style="text-align: right;">
+            <h2 style="margin: 0; font-size: 20px;">Your Company Ltd.</h2>
+            <p style="color: #666; font-size: 12px;">Motijheel, Dhaka-1000</p>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; margin-bottom: 40px;">
+          <div>
+            <p style="font-size: 10px; color: #10b981; font-weight: bold; text-transform: uppercase;">Investor Details</p>
+            <h3 style="margin: 5px 0;">${sale.userId?.fullName}</h3>
+            <p style="margin: 0; color: #666; font-size: 13px;">ID: ${sale.userId?.memberCode}</p>
+            <p style="margin: 0; color: #666; font-size: 13px;">Date: ${new Date(sale.saleDate).toLocaleDateString('en-GB')}</p>
+          </div>
+          <div style="text-align: right;">
+            <p style="font-size: 10px; color: #10b981; font-weight: bold; text-transform: uppercase;">Payment Details</p>
+            <p style="margin: 5px 0; font-weight: bold;">Method: ${sale.paymentMethod}</p>
+            <p style="margin: 0; color: #666; font-size: 13px;">Project: ${sale.projectId?.projectName}</p>
+          </div>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; margin-bottom: 50px;">
+          <thead>
+            <tr style="background: #f8fafc; border-bottom: 2px solid #0f172a;">
+              <th style="padding: 12px; text-align: left; font-size: 12px;">Description</th>
+              <th style="padding: 12px; text-align: center; font-size: 12px;">Qty</th>
+              <th style="padding: 12px; text-align: right; font-size: 12px;">Price</th>
+              <th style="padding: 12px; text-align: right; font-size: 12px;">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 20px 12px; border-bottom: 1px solid #f1f5f9;">
+                <b>Project Share Purchase</b><br/>
+                <small style="color: #666;">${sale.projectId?.projectName}</small>
+              </td>
+              <td style="padding: 20px 12px; text-align: center; border-bottom: 1px solid #f1f5f9;">${sale.quantity}</td>
+              <td style="padding: 20px 12px; text-align: right; border-bottom: 1px solid #f1f5f9;">৳${(sale.totalAmount / sale.quantity).toLocaleString()}</td>
+              <td style="padding: 20px 12px; text-align: right; border-bottom: 1px solid #f1f5f9; font-weight: bold;">৳${sale.totalAmount?.toLocaleString()}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-top: 50px;">
+          <div>
+            <div style="width: 150px; border-top: 1px solid #000; margin-bottom: 5px;"></div>
+            <p style="font-size: 10px; text-transform: uppercase; font-weight: bold; color: #999;">Authorized Signature</p>
+          </div>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 10px; width: 200px;">
+            <p style="margin: 0; font-size: 12px; color: #666;">Total Amount</p>
+            <h2 style="margin: 5px 0; color: #10b981;">৳${sale.totalAmount?.toLocaleString()}</h2>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // ২. PDF কনফিগারেশন
+    const opt = {
+      margin: 0,
+      filename: `Invoice_${sale.saleNumber}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // ৩. ডাউনলোড রান করা
+    html2pdf().set(opt).from(element).save();
+  };
+// end  ডাউনলোড ফাংশন 
+
+
   if (loading) return <div className="h-screen flex items-center justify-center font-black text-emerald-600 animate-pulse text-xl">Loading Data...</div>;
 
   return (
@@ -182,10 +273,19 @@ const ShareSales = () => {
                     </span>
                   </td>
                   <td className="px-8 py-6 text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all"><Eye size={16}/></button>
-                      <button className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all"><FileText size={16}/></button>
-                      <button className="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-900 hover:text-white transition-all"><Download size={16}/></button>
+                    <div className="flex justify-end gap-2 transition-all">
+                      <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all"
+                         onClick={() => setSelectedSale(sale)} 
+                      ><Eye size={16}/></button>
+                      <button className="p-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-600 hover:text-white transition-all"><FileText size={16}
+                        onClick={()  => setSelectedSale(sale)}
+                      /></button>
+                      <button className="p-2 bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-900 hover:text-white transition-all"
+                        onClick={() => handleDownloadPDF(sale)} // এই ফাংশনটি কল হবে
+                        title="Download Invoice"
+                      ><Download size={16}/></button>
+                    
+                    
                     </div>
                   </td>
                 </tr>
@@ -242,66 +342,6 @@ const ShareSales = () => {
                     />
                 </div>
                 </div>
-                {/* Row 2
-                <div className="grid grid-cols-2 gap-8">
-                    <div>
-                        <label className="text-[11px] font-black text-slate-500 uppercase ml-1 tracking-wider mb-2 block">Select Project</label>
-                        <div className="relative">
-                        <select 
-                            required 
-                            className="w-full bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl p-4 outline-none font-bold text-slate-700 transition-all appearance-none cursor-pointer" 
-                            value={formData.projectId} 
-                            onChange={(e) => handleProjectChange(e.target.value)}
-                        >
-                            <option value="">Choose Project...</option>
-                            {projects.map(p => <option key={p._id} value={p._id}>{p.projectName}</option>)}
-                        </select>
-                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                            <ChevronDown size={20} />
-                        </div>
-                        </div>
-                    </div>
-                <div>
-                    <label className="text-[11px] font-black text-slate-500 uppercase ml-1 tracking-wider mb-2 block">Payment Method</label>
-                    <select 
-                    required 
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl p-4 outline-none font-bold text-blue-600 transition-all cursor-pointer" 
-                    value={formData.paymentMethod} 
-                    onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
-                    >
-                    <option value="Cash">Cash Payment</option>
-                    <option value="Bank">Bank Transfer</option>
-                    <option value="Mobile Bank">Mobile Banking</option>
-                    </select>
-                </div>
-                </div> */}
-                {/* Row 3
-                <div className="grid grid-cols-2 gap-8">
-                    <div>
-                        <label className="text-[11px] font-black text-slate-500 uppercase ml-1 tracking-wider mb-2 block">Price Per Share</label>
-                        <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400">৳</span>
-                        <input 
-                            readOnly 
-                            className="w-full bg-blue-50/30 border-2 border-blue-100 rounded-2xl p-4 pl-9 outline-none font-black text-blue-700" 
-                            value={formData.pricePerShare} 
-                        />
-                        </div>
-                    </div>
-                <div>
-                    <label className="text-[11px] font-black text-slate-500 uppercase ml-1 tracking-wider mb-2 block">Quantity</label>
-                    <input 
-                    required 
-                    type="number" 
-                    placeholder="00"
-                    className="w-full bg-slate-50 border-2 border-transparent focus:border-emerald-500 focus:bg-white rounded-2xl p-4 outline-none font-bold text-slate-700 transition-all" 
-                    value={formData.quantity} 
-                    onChange={(e) => handleQtyChange(e.target.value)} 
-                    />
-                </div>
-                </div> */}
-
-                {/* Row 2: Select Project & Payment Method */}
                 <div className="grid grid-cols-2 gap-8">
                 <div className="space-y-1.5">
                     <label className="text-[11px] font-black text-slate-500 uppercase ml-1 tracking-wider mb-2 block">Select Project</label>
