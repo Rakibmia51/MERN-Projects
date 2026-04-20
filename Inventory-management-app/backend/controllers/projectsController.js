@@ -1,5 +1,6 @@
 const Projects = require("../models/project");
 const ShareIssue = require("../models/shareIssue");
+const shareSale = require("../models/shareSale");
 
 const createProject =async(req, res)=>{
 
@@ -25,7 +26,7 @@ const createProject =async(req, res)=>{
 
         await newProject.save();
         return res.status(201).json({success: true, message: 'Project Create successfully'})
-        // res.status(201).json(savedProject);
+       
     } catch (error) {
         return res.status(500).json({success: false, message: error.message})
     }
@@ -34,13 +35,16 @@ const createProject =async(req, res)=>{
 
 const getProjects =async(req, res)=>{
     try {
-        const projects = await Projects.find().sort({ createdAt: -1 });
+        const projects = await Projects.find()
+            .sort({ createdAt: -1 });
 
         const shareIssue = await ShareIssue.find()
                     .populate('projectId', 'totalQuantity pricePerShare totalValue')
                     .sort({ createdAt: -1 });
-
-        return res.status(200).json({
+        
+       
+        
+                    return res.status(200).json({
             success:true, 
             projects,
             shareIssue
@@ -60,6 +64,93 @@ const getProject = async(req, res)=>{
         res.status(500).json({ message: error.message });
     }
 }
+
+const projectAllDetails = async (req, res) => {
+    try {
+        const projects = await Projects.find().lean();
+        const shareIssues = await ShareIssue.find().lean();
+
+        const result = projects.map(project => {
+            // shareIssue এর ভেতর projectId একটি অবজেক্ট, তাই ._id দিয়ে চেক করতে হবে
+            const share = shareIssues.find(s => 
+                s.projectId?._id?.toString() === project._id.toString() || 
+                s.projectId?.toString() === project._id.toString()
+            );
+      
+            return {
+                ...project,
+                shareDetails: share || null
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Data fetch korte somossa hoyeche",
+            error: error.message
+        });
+    }
+};
+
+
+const getProjectDetailsById = async (req, res) => {
+    try {
+        const { id } = req.params; // ইউজার আইডি পাঠাবে URL-এ
+
+        // ১. নির্দিষ্ট প্রজেক্ট খুঁজে বের করা
+        const project = await Projects.findById(id).lean();
+
+        if (!project) {
+            return res.status(404).json({
+                success: false,
+                message: "Project pawa jayni"
+            });
+        }
+
+        // ২. এই প্রজেক্টের সাথে মিল আছে এমন ShareIssue খুঁজে বের করা
+        const share = await ShareIssue.findOne({ 
+            $or: [
+                { "projectId": id },
+                { "projectId._id": id }
+            ]
+        }).lean();
+
+        // ৩. এই প্রজেক্টের অধীনে যত শেয়ার বিক্রি (Sales) হয়েছে সব আনা
+        // এখানে .populate() ব্যবহার করলে মেম্বারের নাম সরাসরি পাওয়া যাবে (যদি মডেলে রেফারেন্স থাকে)
+        const shareSales = await shareSale.find({ 
+            $or: [
+                { "projectId": id }, 
+                { "projectId._id": id }
+            ]
+        }).populate('userId', 'fullName memberCode').lean();
+
+        // 4. প্রজেক্টের সাথে শেয়ারের তথ্য যুক্ত করা
+        const result = {
+            ...project,
+            shareDetails: share || null,
+            shareSales: shareSales || [] // সেলসের লিস্ট এখানে থাকবে
+        };
+
+        res.status(200).json({
+            success: true,
+            data: result
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
+
+
+
 
 const deleteProject = async (req, res) => {
 
@@ -114,4 +205,4 @@ const updateProject = async (req, res) => {
 };
 
 
-module.exports = {createProject, getProjects, getProject, deleteProject, updateProject}
+module.exports = {createProject, getProjects, getProject, deleteProject, updateProject, projectAllDetails, getProjectDetailsById}
