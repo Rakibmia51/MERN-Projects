@@ -10,6 +10,7 @@ import ProjectDashboard from './components/ProjectDashboard'
 import ProjectDetails from './components/ProjectDetails'
 import ShareIssueList from './components/ShareIssueList'
 import ProjectWithShares from './components/ShareSalesList'
+import GlobalInvestmentTable from './components/EndPoints'
 
 
 function App() {
@@ -85,7 +86,7 @@ function App() {
                 <Route
                   path='endpoints'
                   element={
-                    <h1>Endpoints</h1>
+                    <GlobalInvestmentTable/>
                   }
                 />
                 <Route

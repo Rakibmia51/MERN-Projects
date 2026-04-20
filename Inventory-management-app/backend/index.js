@@ -7,6 +7,7 @@ const usersRoutes = require('./routes/users')
 const projectsRoutes = require('./routes/projects')
 const sharesRoutes = require('./routes/ShareIssue')
 const shareSalesRoutes = require('./routes/shareSales')
+const endpointsRoutes = require('./routes/endPoint')
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -18,7 +19,7 @@ app.use('/api/users', usersRoutes)
 app.use('/api/projects', projectsRoutes)
 app.use('/api/shares', sharesRoutes)
 app.use('/api/share-sales', shareSalesRoutes)
-
+app.use('/api/endpoints', endpointsRoutes)
 
 
 app.get('/', (req, res) => {
