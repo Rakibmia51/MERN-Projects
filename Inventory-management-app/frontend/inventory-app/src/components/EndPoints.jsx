@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Filter, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
+import { Search, Filter,Trash2, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
 import Swal from 'sweetalert2';
 
 
@@ -17,7 +17,6 @@ const GlobalInvestmentTable = () => {
   const [formData, setFormData] = useState({
     projectId: '', endpointName: '', type: 'Income', amount: '', description: '' ,date: new Date().toISOString().split('T')[0]
   });
-
 
 
   const fetchData = async () => {
@@ -61,6 +60,29 @@ const handleFormSubmit = async (e) => {
   };
 
 
+  const handleDelete = async (id) =>{
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!'
+    });
+    if(result.isConfirmed){
+            try {
+            const res = await axios.delete(`http://localhost:3000/api/endpoints/delete/${id}`, {
+                headers: { Authorization: `Bearer ${localStorage.getItem("pos-token")}` }
+            });
+            if(res.data.success){
+                Swal.fire('Deleted!', 'EndPoint has been deleted.', 'success');
+            
+                fetchData(); // টেবিল ডাটা রিফ্রেশ করা
+            
+            }
+        } catch (error) {
+            Swal.fire('Error', 'Delete failed', 'error');
+        }
+    }
+  }
 
 
   if (loading) return (
@@ -163,6 +185,7 @@ const handleFormSubmit = async (e) => {
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Amount</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Action</th>
                 </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
@@ -202,6 +225,14 @@ const handleFormSubmit = async (e) => {
                         <Calendar size={14} />
                         {new Date(item.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
+                    </td>
+                     <td className="px-6 py-4">
+                         <button 
+                                onClick={() => handleDelete(item._id)}
+                                className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"
+                            >
+                                <Trash2 size={16}/>
+                            </button>
                     </td>
                     </tr>
                 ))}
