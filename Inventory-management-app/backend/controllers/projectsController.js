@@ -1,3 +1,4 @@
+const InvestmentEndpoint = require("../models/endPoint");
 const Projects = require("../models/project");
 const ShareIssue = require("../models/shareIssue");
 const shareSale = require("../models/shareSale");
@@ -128,11 +129,35 @@ const getProjectDetailsById = async (req, res) => {
             ]
         }).populate('userId', 'fullName memberCode').lean();
 
+
+        const endPoints = await InvestmentEndpoint.find({
+            $or: [
+                { "projectId": id }, 
+                { "projectId._id": id }
+            ]
+        })
+        .sort({ createdAt: -1})
+        .populate('projectId', 'projectName')
+
+        const totals = endPoints.reduce((acc, curr) => {
+            if(curr.type === 'Income') acc.income += curr.amount;
+            if(curr.type === 'Expense') acc.expense += curr.amount;
+
+            return acc;
+        }, {income: 0, expense: 0})
+
         // 4. প্রজেক্টের সাথে শেয়ারের তথ্য যুক্ত করা
         const result = {
             ...project,
             shareDetails: share || null,
-            shareSales: shareSales || [] // সেলসের লিস্ট এখানে থাকবে
+            shareSales: shareSales || [], // সেলসের লিস্ট এখানে থাকবে
+            endPoints: 
+                {
+                    totalIncome: totals.income,
+                    totalExpense: totals.expense,
+                    netProfit: totals.income - totals.expense,
+                    data: endPoints || []
+                }
         };
 
         res.status(200).json({

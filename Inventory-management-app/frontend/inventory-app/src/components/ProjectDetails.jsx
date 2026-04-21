@@ -15,6 +15,7 @@ const ProjectDetails = () => {
           headers: { Authorization: `Bearer ${localStorage.getItem("pos-token")}` }
         });
         setProject(res.data.data);
+        console.log(res.data.data)
       } catch (err) { console.error(err); }
     };
     fetchProject();
@@ -24,8 +25,10 @@ const ProjectDetails = () => {
 
   // --- Calculations ---
   const totalCashIn = (project.initialInvestment || 0) + (project.shareValue || 0);
-  const availableToDeploy = totalCashIn - (project.expenses || 0);
-  const roi = project.initialInvestment > 0 ? (((project.currentValue - project.initialInvestment) / project.initialInvestment) * 100).toFixed(1) : 0;
+  const availableToDeploy = project.shareDetails.totalValue + project.endPoints.netProfit
+  // const roi = project.initialInvestment > 0 ? (((project.currentValue - project.initialInvestment) / project.initialInvestment) * 100).toFixed(1) : 0;
+  const roi = ((project.endPoints.netProfit / project.shareDetails.totalValue) * 100).toFixed(2)
+
   const totalInvestment = (project.shareDetails.soldQuantity || 0) * (project.shareDetails.pricePerShare || 0)
 
   //--- Ownership Summary 
@@ -99,9 +102,10 @@ const ProjectDetails = () => {
             <p className="text-[9px] font-black text-slate-400 uppercase">ROI Performance</p>
             <h3 className={`text-lg font-black ${roi >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>{roi}%</h3>
           </div>
-          <CompactCard title="Total Income" value={project.totalIncome} color="text-emerald-600" highlight />
-          <CompactCard title="Total Expenses" value={project.expenses} color="text-rose-600" />
-          <CompactCard title="Current Value" value={project.currentValue} color="text-blue-600" />
+          <CompactCard title="Total Income" value={project.endPoints.totalIncome} color="text-emerald-600" highlight />
+          <CompactCard title="Total Expenses" value={project.endPoints.totalExpense} color="text-rose-600" />
+
+          <CompactCard title="Total Profit" value={project.endPoints.netProfit} color={`${project.endPoints.netProfit >= 0 ? "text-emerald-600" : "text-rose-600"}`} highlight />
          
         </div>
 
@@ -127,7 +131,6 @@ const ProjectDetails = () => {
               Recent Sales
             </span>
           </div>
-
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -220,65 +223,126 @@ const ProjectDetails = () => {
               Add Investment
             </button>
           </div>
+          {/* Income, Expense, এবং Profit DashBoard  */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Income Card */}
+            <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Income</p>
+                  <h3 className="text-2xl font-black text-emerald-600 mt-1">
+                    {project.endPoints.totalIncome.toLocaleString()} <span className="text-xs">TK</span>
+                  </h3>
+                </div>
+                <div className="h-10 w-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
+                  <svg xmlns="http://w3.org" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-3 font-medium">পেমেন্ট কালেকশন থেকে প্রাপ্ত</p>
+            </div>
+            {/* Expense Card */}
+            <div className="bg-white p-5 rounded-xl border border-slate-100 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Total Expense</p>
+                  <h3 className="text-2xl font-black text-rose-500 mt-1">
+                    {project.endPoints.totalExpense.toLocaleString()} <span className="text-xs">TK</span>
+                  </h3>
+                </div>
+                <div className="h-10 w-10 bg-rose-50 rounded-lg flex items-center justify-center text-rose-500">
+                  <svg xmlns="http://w3.org" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-3 font-medium">প্রজেক্ট পরিচালনা খরচ</p>
+            </div>
+            {/* Net Profit Card */}
+            <div className={`p-5 rounded-xl border shadow-sm ${project.endPoints.netProfit >= 0 ? 'bg-indigo-600 border-indigo-600' : 'bg-rose-600 border-rose-600'}`}>
+              <div className="flex items-center justify-between text-white">
+                <div>
+                  <p className="text-[10px] font-black opacity-80 uppercase tracking-wider">Net Profit</p>
+                  <h3 className="text-2xl font-black mt-1">
+                    {project.endPoints.netProfit.toLocaleString()} <span className="text-xs">TK</span>
+                  </h3>
+                </div>
+                <div className="h-10 w-10 bg-white/20 rounded-lg flex items-center justify-center">
+                  <svg xmlns="http://w3.org" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+              </div>
+              <p className="text-[10px] text-white/70 mt-3 font-medium">বর্তমান ব্যালেন্স স্ট্যাটাস</p>
+            </div>
+          </div>
+          {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50">
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Name</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Type</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Status</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Income</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Expense</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Profit</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {/* লুপ চালিয়ে ডাটা দেখানোর জন্য: project.investments.map(...) */}
-                <tr className="hover:bg-slate-50/80 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="text-xs font-black text-slate-700">{project.projectName}</p>
-                    <p className="text-[10px] text-slate-400 font-medium">{project.projectCode}</p>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-bold text-slate-500">
-                    {project.description || "Agro"}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${
-                      project.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
-                    }`}>
-                      {project.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-xs font-black text-emerald-600">
-                    +{(project.totalIncome || 0).toLocaleString()} TK
-                  </td>
-                  <td className="px-6 py-4 text-xs font-black text-rose-500">
-                    -{(project.expenses || 0).toLocaleString()} TK
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`text-xs font-black ${(project.totalIncome - project.expenses) >= 0 ? 'text-indigo-600' : 'text-rose-600'}`}>
-                      {(project.totalIncome - project.expenses).toLocaleString()} TK
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <div className="flex justify-center gap-2">
-                      <button className="p-1.5 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-md transition-all">
-                        <svg xmlns="http://w3.org" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                      </button>
-                      <button className="p-1.5 hover:bg-amber-50 text-slate-400 hover:text-amber-600 rounded-md transition-all">
-                        <svg xmlns="http://w3.org" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-50">
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Name</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Type</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Status</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Income</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Expense</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100">Profit</th>
+                    <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-wider border-b border-slate-100 text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {/* লুপ চালিয়ে ডাটা দেখানোর জন্য: project.investments.map(...) */}
+                  {project.endPoints.data.map((end, index) => {
+                      const incomeAmount = end.type === 'Income' ? end.amount: 0;
+                      const expenseAmount = end.type === 'Expense' ? end.amount: 0;
+                      const rowProfit = incomeAmount - expenseAmount;
+
+                        return (
+                          <tr key={index} className="hover:bg-slate-50/80 transition-colors">
+                            <td className="px-6 py-4">
+                              <p className="text-xs font-black text-slate-700">{end.endpointName}</p>
+                              <p className="text-[10px] text-slate-400 font-medium">{new Date(end.date).toLocaleDateString()}</p>
+                            </td>
+                            <td className="px-6 py-4 text-xs font-bold text-slate-500">
+                              {end.type || "Agro"}
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-md text-[10px] font-black uppercase ${
+                                project.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'
+                              }`}>
+                                {project.status}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-xs font-black text-emerald-600">
+                              {incomeAmount > 0 ? `+${incomeAmount.toLocaleString()}` : '0'} TK
+                            </td>
+                            <td className="px-6 py-4 text-xs font-black text-rose-500">
+                              {expenseAmount > 0 ? `-${expenseAmount.toLocaleString()}` : '0'} TK
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`text-xs font-black ${rowProfit >= 0 ? 'text-indigo-600' : 'text-rose-600'}`}>
+                                {rowProfit >= 0 ? `+${rowProfit.toLocaleString()}` : rowProfit.toLocaleString()} TK
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <div className="flex justify-center gap-2">
+                                <button className="p-1.5 hover:bg-indigo-50 text-slate-400 hover:text-indigo-600 rounded-md transition-all">
+                                  <svg xmlns="http://w3.org" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        )
+                    
+                    } 
+                  )}
+                
+                </tbody>
+              </table>
           </div>
         </div>
 

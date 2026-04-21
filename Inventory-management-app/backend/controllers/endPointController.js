@@ -4,8 +4,26 @@ const InvestmentEndpoint = require('../models/endPoint'); // আপনার ম
 const createInvestmentEndpoint = async (req, res) => {
     try {
         const { projectId, endpointName, type, amount, date, description } = req.body;
+        
+        //অটো সেল নম্বর জেনারেট করা
+        const lastEntryByType = await InvestmentEndpoint.findOne({type})
+            .sort({createdAt: -1 })
+            
+            let nextNumber = 1;
+            if(lastEntryByType?.endNumber){
+              // শেষ আইডির নাম্বার অংশটি বের করে ১ যোগ করুন (যেমন: EXP-0005 থেকে ৫ + ১ = ৬)
+                const lastNumberPart = lastEntryByType.endNumber.split('-')[1];
+                nextNumber = parseInt(lastNumberPart) + 1;
+            }
+        // বর্তমান ডাটার টাইপ অনুযায়ী প্রিফিক্স সেট করা (ধরি type ভ্যারিয়েবলটি রিকোয়েস্ট থেকে আসছে)
+            const prefix = type === 'Income' ? 'INC' : 'EXP';
 
+        // আইডি ফরম্যাট করা
+            const formattedNumber = `${prefix}-${nextNumber.toString().padStart(4, '0')}`;
+
+           
         const newEntry = new InvestmentEndpoint({
+            endNumber : formattedNumber,
             projectId,
             endpointName,
             type,
@@ -71,7 +89,7 @@ const getEndpointsByProject = async (req, res) => {
         const { projectId } = req.params;
 
         const endpoints = await InvestmentEndpoint.find({ projectId })
-            .sort({ date: -1 }); // নতুনগুলো আগে দেখাবে
+            .sort({ createdAt: -1 }); // নতুনগুলো আগে দেখাবে
 
         // ইনকাম এবং এক্সপেন্স এর টোটাল ক্যালকুলেশন
         const totals = endpoints.reduce((acc, curr) => {

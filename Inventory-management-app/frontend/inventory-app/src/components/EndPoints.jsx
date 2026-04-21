@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Search, Filter, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
+import Swal from 'sweetalert2';
+
 
 const GlobalInvestmentTable = () => {
   const [allData, setAllData] = useState([]);
@@ -44,12 +46,17 @@ const GlobalInvestmentTable = () => {
 const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/api/endpoints/add', formData);
-      setIsModalOpen(false); // ফর্ম বন্ধ করা
-      fetchData(); // টেবিল ডাটা রিফ্রেশ করা
-      setFormData({ projectId: '', endpointName: '', type: 'Income', amount: '', description: '',date: new Date().toISOString().split('T')[0] });
+        const res = await axios.post('http://localhost:3000/api/endpoints/add', formData, {
+             headers: { Authorization: `Bearer ${localStorage.getItem("pos-token")}` }
+        });
+        if(res.data.success){
+           Swal.fire('Success', 'EndPoint Entry Success', 'success'); 
+            setIsModalOpen(false); // ফর্ম বন্ধ করা
+            fetchData(); // টেবিল ডাটা রিফ্রেশ করা
+            setFormData({ projectId: '', endpointName: '', type: 'Income', amount: '', description: '',date: new Date().toISOString().split('T')[0] });
+        }
     } catch (error) {
-      alert("Error saving data!");
+        Swal.fire('Error', 'Error saving data!', 'error');
     }
   };
 
@@ -162,13 +169,17 @@ const handleFormSubmit = async (e) => {
                 {filteredData.map((item) => (
                     <tr key={item._id} className="hover:bg-slate-50/80 transition-colors group">
                     <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs uppercase">
-                            {item.projectId?.projectName?.charAt(0) || 'P'}
+                        <div className="flex flex-col gap-0.5">
+                            {/* প্রজেক্টের নাম - বোল্ড এবং বড় */}
+                            <span className="text-sm font-black text-slate-800 tracking-tight leading-none">
+                            {item.projectId?.projectName}
+                            </span>
+                            {/* আইডি নাম্বার - ছোট এবং সাবলীল */}
+                            <span className="text-[10px] font-bold text-indigo-500/80 uppercase tracking-widest">
+                            {item.endNumber}
+                            </span>
                         </div>
-                        <p className="text-sm font-bold text-slate-700">{item.projectId?.projectName}</p>
-                        </div>
-                    </td>
+                 </td>
                     <td className="px-6 py-4">
                         <span className="text-sm text-slate-600">{item.endpointName}</span>
                     </td>
