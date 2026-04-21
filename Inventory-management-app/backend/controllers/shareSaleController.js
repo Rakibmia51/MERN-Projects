@@ -64,9 +64,20 @@ const getAllShareSales = async (req, res) => {
             .sort({ createdAt: -1 }); // Newest first
 
 
+  // ২. সব ডাটা থেকে ইনকাম এবং এক্সপেন্স এর মোট যোগফল বের করা
+        const overallTotals = shareSales.reduce((acc, curr) => {
+            if (curr.totalAmount) acc.totalAmount += curr.totalAmount;
+            if(curr.quantity) acc.quantity += curr.quantity;
+            return acc;
+        }, { totalAmount: 0, quantity: 0});
+
         res.status(200).json({
             success: true,
             count: shareSales.length,
+            overallTotals: {
+                totalShareSales: overallTotals.totalAmount,
+                totalShareQty : overallTotals.quantity
+            },
             shareSales
         });
     } catch (error) {

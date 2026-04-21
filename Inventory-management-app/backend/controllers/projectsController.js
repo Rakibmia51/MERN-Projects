@@ -44,11 +44,40 @@ const getProjects =async(req, res)=>{
                     .sort({ createdAt: -1 });
         
        
-        
-                    return res.status(200).json({
+        const shareSales = await shareSale.find()
+                    .sort({ createdAt: -1 });
+
+        const overallTotals = shareSales.reduce((acc, curr) => {
+            if (curr.totalAmount) acc.totalAmount += curr.totalAmount;
+            if(curr.quantity) acc.quantity += curr.quantity;
+            return acc;
+        }, { totalAmount: 0, quantity: 0});
+
+
+        const endPoints = await InvestmentEndpoint.find()
+        .populate('projectId', 'projectName projectCode')
+        .sort({ createdAt: -1 });
+
+        const endPointTotal = endPoints.reduce((acc, curr)=>{
+            if (curr.type === 'Income') acc.income += curr.amount;
+            if (curr.type === 'Expense') acc.expense += curr.amount;
+            return acc;
+        },{ income: 0, expense: 0 })
+
+        return res.status(200).json({
             success:true, 
             projects,
-            shareIssue
+            shareIssue,
+             overallTotals: {
+                totalShareSales: overallTotals.totalAmount,
+                totalShareQty : overallTotals.quantity
+            },
+            endPointTotal: {
+                 totalIncome: endPointTotal.income,
+                totalExpense: endPointTotal.expense,
+                totalProfit: endPointTotal.income - endPointTotal.expense
+            },
+            endPoints
         })
     } catch (error) {
        return res.status(500).json({success: false, message: error.message})

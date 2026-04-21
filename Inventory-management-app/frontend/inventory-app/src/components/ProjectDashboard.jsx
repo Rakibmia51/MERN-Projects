@@ -23,11 +23,8 @@ const ProjectList = () => {
     notes: ''
   });
   const [editId, setEditId] = useState(null); // Track project being edited
-
-
-
-
-
+  const [shareSales, setShareSales] = useState([]);
+  const [endPoint, setEndPoint] = useState([]);
 
   const fetchProjects = async () => {
     try {
@@ -37,6 +34,8 @@ const ProjectList = () => {
       });
       if (response.data.success) {
         setProjects(response.data.projects);
+        setShareSales(response.data.overallTotals)
+        setEndPoint(response.data.endPointTotal)
       }
       setLoading(false);
     } catch (err) {
@@ -99,7 +98,6 @@ const ProjectList = () => {
         const response = await axios.delete(`http://localhost:3000/api/projects/delete/${id}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem("pos-token")}` }
         });
-
         if (response.data.success) {
           // ডিলিট সফল হলে স্টেট থেকে ওই প্রজেক্টটি ফিল্টার করে সরিয়ে ফেলুন
           setProjects(projects.filter(p => p._id !== id));
@@ -132,6 +130,7 @@ const ProjectList = () => {
   setIsModalOpen(true);
 };
 
+
  // --- সার্চ এবং ফিল্টারিং লজিক ---
   const filteredProjects = projects.filter(project => {
     const matchesSearch = 
@@ -157,6 +156,9 @@ const ProjectList = () => {
         onDelete={handleDelete} 
         setIsModalOpen={setIsModalOpen}
         onEdit={handleEditClick}
+        shareSales={shareSales}
+        endPoint = {endPoint}
+        
      
       />
       {/* --- ADD and Update PROJECT MODAL --- */}
@@ -241,8 +243,6 @@ const ProjectList = () => {
           </div>
         )}
 
-    
-        
     </>
        
 
@@ -260,13 +260,18 @@ const ProjectDashboard = ({
       onDelete,
       setIsModalOpen,
       onEdit,
+      shareSales=[],
+      endPoint = []
       // onView 
     
     }
     ) => {
         // ড্যাশবোর্ড কার্ডের জন্য ক্যালকুলেশন (ফিল্টার করা ডাটা অনুযায়ী)
-        const totalInvestment = projects.reduce((sum, p) => sum + (p.initialInvestment || 0), 0);
-        const netProfit = projects.reduce((sum, p) => sum + ((p.currentValue || 0) - (p.initialInvestment || 0)), 0);
+
+        // const totalInvestment = projects.reduce((sum, p) => sum + (p.initialInvestment || 0), 0);
+        const totalInvestment = shareSales.totalShareSales;
+        // const netProfit = projects.reduce((sum, p) => sum + ((p.currentValue || 0) - (p.initialInvestment || 0)), 0);
+        const netProfit = endPoint.totalProfit;
 
 
          const navigate = useNavigate();
@@ -277,6 +282,7 @@ const ProjectDashboard = ({
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
               <StatCard title="Total Projects" value={projects.length} icon={<LayoutGrid />} color="bg-blue-600" />
               <StatCard title="Active Projects" value={projects.filter(p => p.status === 'Active').length} icon={<Activity />} color="bg-green-600" />
+
               <StatCard title="Total Investment" value={`${totalInvestment.toLocaleString()}`} icon={<DollarSign />} color="bg-indigo-600" />
               <StatCard title="Net Profit" value={`${netProfit.toLocaleString()}`} icon={<TrendingUp />} color="bg-emerald-600" />
             </div>
