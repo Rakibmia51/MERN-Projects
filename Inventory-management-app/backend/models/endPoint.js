@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 
 const investmentEndpointSchema = new mongoose.Schema({
+
+  endNumber: { type: String, unique: true },
   // ১. কোন প্রজেক্টের আন্ডারে এই লেনদেন (Reference)
   projectId: {
     type: mongoose.Schema.Types.ObjectId,
