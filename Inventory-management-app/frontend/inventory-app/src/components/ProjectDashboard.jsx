@@ -288,14 +288,26 @@ const ProjectDashboard = ({
                 .filter(sale => (sale.projectId?.$oid || sale.projectId) === stringId)
                 .reduce((sum, sale) => sum + sale.totalAmount, 0);
 
+
+
+              // আপডেট করা লজিক (Income - Expense) Profit value
               const endPoint = (shareSales?.endPoints || [])
-                .filter(end => (end.projectId?.$oid || end.projectId) === stringId)
-                // .reduce((sum, end) => sum + end.)
+                .filter(end => (end.projectId?._id.$oid || end.projectId._id) === stringId)
+                .reduce((acc, end) => {
+                  if(end.type === "Income"){
+                    return acc + end.amount;
+                  }else if (end.type === "Expense"){
+                    return acc - end.amount;
+                  }
+                  return acc;
+                }, 0)
 
                 return {
                    ...project, // প্রজেক্টের সব অরিজিনাল ডাটা রাখলাম
                   id: stringId, // ইউনিক স্ট্রিং আইডি
-                  totalSold: totalSold
+                  totalSold: totalSold || 0,
+                  endPointTotal: (totalSold + endPoint) || 0,
+                  roi : (endPoint / totalSold *100) || 0
                 };
               });
           };
@@ -382,10 +394,10 @@ const ProjectDashboard = ({
                         <td className="px-6 py-4 font-medium text-blue-600">{project.projectCode}</td>
                         <td className="px-6 py-4 text-gray-800 font-semibold">{project.projectName}</td>
                         <td className="px-6 py-4 text-right text-gray-600">{project.totalSold.toLocaleString()}</td>
-                        <td className="px-6 py-4 text-right text-gray-600">{project.currentValue?.toLocaleString() || 0}</td>
+                        <td className="px-6 py-4 text-right text-gray-600">{project.endPointTotal.toLocaleString() || 0}</td>
                         <td className="px-6 py-4 text-center">
-                          <span className={`font-bold ${calculateROI(project) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {calculateROI(project)}%
+                          <span className={`font-bold ${project.roi >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {project.roi.toFixed(2)}%
                           </span>
                         </td>
                         <td className="px-6 py-4 text-gray-500 text-sm">
