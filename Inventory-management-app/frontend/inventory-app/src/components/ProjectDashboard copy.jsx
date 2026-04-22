@@ -274,33 +274,33 @@ const ProjectDashboard = ({
         // const netProfit = projects.reduce((sum, p) => sum + ((p.currentValue || 0) - (p.initialInvestment || 0)), 0);
         const netProfit = endPoint.totalProfit;
 
-          const getProjectWiseSales = () => {
-              if (!projects || projects.length === 0) return [];
+        const calculateProjectSales = () =>{
+            const summary = shareSales.shareSales.reduce((acc, sale) =>{
+              // বিক্রয়টি কোন প্রজেক্টের তার আইডি বের করা
+                const projId = sale.projectId.$oid || sale.projectId; 
 
-              return projects.map(project => {
-                // আইডি অবজেক্ট বা স্ট্রিং যাই হোক তা বের করে নেওয়া
-                // এখানে আমরা আইডিটিকে স্ট্রিং বানিয়ে নিচ্ছি
-                const stringId = project._id?.$oid || project._id;
+                 // মেইন প্রজেক্ট লিস্ট থেকে নাম খুঁজে বের করা
+                const projectInfo = projects.find(p => (p._id.$oid || p._id) === projId);
+                const projectName = projectInfo ? projectInfo.projectName : "Unknown Project";
+                const projectStatus = projectInfo ? projectInfo.status : "";
+                
 
-
-                // shareSales থেকে এই প্রজেক্টের মোট শেয়ার হিসাব করা
-              const totalSold = (shareSales?.shareSales || [])
-                .filter(sale => (sale.projectId?.$oid || sale.projectId) === stringId)
-                .reduce((sum, sale) => sum + sale.totalAmount, 0);
-
-              const endPoint = (shareSales?.endPoints || [])
-                .filter(end => (end.projectId?.$oid || end.projectId) === stringId)
-                // .reduce((sum, end) => sum + end.)
-
-                return {
-                   ...project, // প্রজেক্টের সব অরিজিনাল ডাটা রাখলাম
-                  id: stringId, // ইউনিক স্ট্রিং আইডি
-                  totalSold: totalSold
+              if (!acc[projId]) {
+                acc[projId] = {
+                  name: projectName,
+                  totalQty: 0,
+                  totalRevenue: 0
                 };
-              });
-          };
-          const tableData = getProjectWiseSales();
+              }
+               // কোয়ান্টিটি এবং টাকা যোগ করা
+              acc[projId].totalQty += sale.quantity;
+              acc[projId].totalRevenue += sale.totalAmount;
 
+              return acc;
+            }, {})
+            return Object.values(summary);
+        }
+        const projectWiseSales = calculateProjectSales();
 
 
          const navigate = useNavigate();
@@ -377,11 +377,11 @@ const ProjectDashboard = ({
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
-                    {tableData.length > 0 ? tableData.map((project) => (
-                      <tr key={project._id?.$oid || project._id} className="hover:bg-gray-50 transition">
+                    {projects.length > 0 ? projects.map((project) => (
+                      <tr key={project._id} className="hover:bg-gray-50 transition">
                         <td className="px-6 py-4 font-medium text-blue-600">{project.projectCode}</td>
                         <td className="px-6 py-4 text-gray-800 font-semibold">{project.projectName}</td>
-                        <td className="px-6 py-4 text-right text-gray-600">{project.totalSold.toLocaleString()}</td>
+                        <td className="px-6 py-4 text-right text-gray-600">{0}</td>
                         <td className="px-6 py-4 text-right text-gray-600">{project.currentValue?.toLocaleString() || 0}</td>
                         <td className="px-6 py-4 text-center">
                           <span className={`font-bold ${calculateROI(project) >= 0 ? 'text-green-600' : 'text-red-600'}`}>

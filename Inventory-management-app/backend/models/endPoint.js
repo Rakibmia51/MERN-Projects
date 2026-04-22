@@ -30,7 +30,10 @@ const investmentEndpointSchema = new mongoose.Schema({
     default: Date.now,
     required: true
   },
-
+  paymentMethod: { 
+    type: String, 
+    enum: ['Cash', 'Bank', 'Mobile Bank'],
+  },
   // ৫. টাকার পরিমাণ
   amount: {
     type: Number,

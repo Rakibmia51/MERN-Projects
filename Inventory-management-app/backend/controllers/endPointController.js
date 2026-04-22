@@ -3,7 +3,7 @@ const InvestmentEndpoint = require('../models/endPoint'); // আপনার ম
 // নতুন ইনভেস্টমেন্ট এন্ডপয়েন্ট তৈরি করা
 const createInvestmentEndpoint = async (req, res) => {
     try {
-        const { projectId, endpointName, type, amount, date, description } = req.body;
+        const { projectId, endpointName, type, paymentMethod, amount, date, description } = req.body;
         
         //অটো সেল নম্বর জেনারেট করা
         const lastEntryByType = await InvestmentEndpoint.findOne({type})
@@ -27,6 +27,7 @@ const createInvestmentEndpoint = async (req, res) => {
             projectId,
             endpointName,
             type,
+            paymentMethod,
             amount,
             date,
             description
