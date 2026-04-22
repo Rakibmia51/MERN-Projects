@@ -25,12 +25,12 @@ const ProjectDetails = () => {
 
   // --- Calculations ---
   const totalCashIn = (project.initialInvestment || 0) + (project.shareValue || 0);
-  const availableToDeploy = project.shareDetails.totalValue + project.endPoints.netProfit
   // const roi = project.initialInvestment > 0 ? (((project.currentValue - project.initialInvestment) / project.initialInvestment) * 100).toFixed(1) : 0;
-  const roi = ((project.endPoints.netProfit / project.shareDetails.totalValue) * 100).toFixed(2)
+  const investment = (project.shareDetails.pricePerShare * project.shareDetails.soldQuantity)
+  const roi = (((project.endPoints.netProfit || 0) / investment || 0) * 100).toFixed(2)
 
   const totalInvestment = (project.shareDetails.soldQuantity || 0) * (project.shareDetails.pricePerShare || 0)
-
+ const availableToDeploy = totalInvestment + project.endPoints.netProfit
   //--- Ownership Summary 
 
   // মোট ইস্যু করা শেয়ার সংখ্যা (ধরা যাক ১২০০)
