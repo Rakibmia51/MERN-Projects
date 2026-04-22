@@ -64,6 +64,9 @@ const getProjects =async(req, res)=>{
             return acc;
         },{ income: 0, expense: 0 })
 
+
+        
+
         return res.status(200).json({
             success:true, 
             projects,
@@ -72,6 +75,7 @@ const getProjects =async(req, res)=>{
                 totalShareSales: overallTotals.totalAmount,
                 totalShareQty : overallTotals.quantity
             },
+            shareSales,
             endPointTotal: {
                  totalIncome: endPointTotal.income,
                 totalExpense: endPointTotal.expense,

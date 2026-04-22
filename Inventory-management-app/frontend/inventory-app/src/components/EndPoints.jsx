@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Filter,Trash2, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
+import { Search, Filter,Trash2, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign, Banknote, Landmark, Smartphone } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
 import Swal from 'sweetalert2';
 
 
@@ -15,7 +15,7 @@ const GlobalInvestmentTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [projects, setProjects] = useState([]);
   const [formData, setFormData] = useState({
-    projectId: '', endpointName: '', type: 'Income', amount: '', description: '' ,date: new Date().toISOString().split('T')[0]
+    projectId: '', endpointName: '', type: 'Income',paymentMethod: 'Cash', amount: '', description: '' ,date: new Date().toISOString().split('T')[0]
   });
 
 
@@ -42,7 +42,7 @@ const GlobalInvestmentTable = () => {
     fetchData();
   }, []);
 
-const handleFormSubmit = async (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
         const res = await axios.post('http://localhost:3000/api/endpoints/add', formData, {
@@ -52,13 +52,12 @@ const handleFormSubmit = async (e) => {
            Swal.fire('Success', 'EndPoint Entry Success', 'success'); 
             setIsModalOpen(false); // ফর্ম বন্ধ করা
             fetchData(); // টেবিল ডাটা রিফ্রেশ করা
-            setFormData({ projectId: '', endpointName: '', type: 'Income', amount: '', description: '',date: new Date().toISOString().split('T')[0] });
+            setFormData({ projectId: '', endpointName: '', type: 'Income', paymentMethod:'Cash', amount: '', description: '',date: new Date().toISOString().split('T')[0] });
         }
     } catch (error) {
         Swal.fire('Error', 'Error saving data!', 'error');
     }
   };
-
 
   const handleDelete = async (id) =>{
     const result = await Swal.fire({
@@ -183,6 +182,7 @@ const handleFormSubmit = async (e) => {
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Project Details</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Endpoint</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Type</th>
+                    <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Payment</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider text-right">Amount</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Date</th>
                     <th className="px-6 py-4 text-[11px] font-bold text-slate-500 uppercase tracking-wider">Action</th>
@@ -214,6 +214,13 @@ const handleFormSubmit = async (e) => {
                         }`}>
                         {item.type}
                         </span>
+                    </td>
+                    <td className="px-6 py-4">
+                       <div className="flex items-center gap-2">
+                            {item.paymentMethod === 'Cash' && <><Banknote size={14} className="text-green-500"/> <span className="text-xs font-bold">Cash</span></>}
+                            {item.paymentMethod === 'Bank' && <><Landmark size={14} className="text-blue-500"/> <span className="text-xs font-bold">Bank</span></>}
+                            {item.paymentMethod === 'Mobile Bank' && <><Smartphone size={14} className="text-pink-500"/> <span className="text-xs font-bold">Mobile Bank</span></>}
+                       </div>
                     </td>
                     <td className={`px-6 py-4 text-sm font-bold text-right ${
                         item.type === 'Income' ? 'text-emerald-600' : 'text-rose-500'
@@ -292,6 +299,17 @@ const handleFormSubmit = async (e) => {
                     <option value="Income">Income</option>
                     <option value="Expense">Expense</option>
                 </select>
+                </div>
+                <div className="space-y-1">
+                    <label className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1"><Banknote  size={12}/> Payment</label>
+                    <select 
+                        className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none"
+                        value={formData.paymentMethod} onChange={(e) => setFormData({...formData, paymentMethod: e.target.value})}
+                    >
+                        <option value="Cash">Cash</option>
+                        <option value="Bank">Bank</option>
+                        <option value="Mobile Bank">Mobile Bank</option>
+                    </select>
                 </div>
                 <div className="space-y-1">
                 <label className="text-[10px] font-black text-slate-400 uppercase flex items-center gap-1"><DollarSign size={12}/> Amount</label>
