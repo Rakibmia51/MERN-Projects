@@ -1,5 +1,6 @@
 const Projects = require('../models/project');
 const ShareIssue = require('../models/shareIssue');
+const shareSale = require('../models/shareSale');
 
 
 
@@ -131,6 +132,24 @@ const getLatestPrice = async (req, res) => {
     }
 };
 
+const getShareIssuesByProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+        
+        // নির্দিষ্ট প্রোজেক্টের সব শেয়ার সেল এবং ইউজারের (ইনভেস্টর) তথ্য আনা
+        const shares = await shareSale.find({ projectId: projectId })
+            .populate('userId', 'fullName email mobile'); // User মডেলের ফিল্ড অনুযায়ী (name বা username)
+
+        if (!shares || shares.length === 0) {
+            return res.status(200).json([]); // ইনভেস্টর না থাকলে ফাঁকা অ্যারে
+        }
+
+        res.status(200).json(shares);
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
 
 
-module.exports ={createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue}
+
+module.exports ={getShareIssuesByProject, createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue}

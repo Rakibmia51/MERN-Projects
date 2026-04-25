@@ -3,7 +3,9 @@ const router = express.Router();
 const { 
     getProjectSummary, 
     calculateAndSaveMonthlyProfit, 
-    getProfitHistory 
+    getProfitHistory, 
+    updateProfitStatus,
+    getProfitDetails
 } = require('../controllers/profitController');
 
 // ১. ড্রপডাউন থেকে প্রোজেক্ট সিলেক্ট করলে সামারি ডেটা দেখানোর জন্য
@@ -17,5 +19,9 @@ router.post('/save', calculateAndSaveMonthlyProfit);
 // ৩. আগের করা সব প্রফিট ক্যালকুলেশনের লিস্ট দেখার জন্য
 // GET: /api/profit/history
 router.get('/history', getProfitHistory);
+
+router.put('/status/:id', updateProfitStatus)
+
+router.get('/details/:id', getProfitDetails);
 
 module.exports = router;

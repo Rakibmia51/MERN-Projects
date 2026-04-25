@@ -1,7 +1,7 @@
 const express = require('express');
 
 const authMiddleware = require('../middleware/authMiddleware');
-const { createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue } = require('../controllers/shareIssueController');
+const {getShareIssuesByProject , createShareIssue,getLatestPrice, getShareIssues, singleShareIssue, updateShareIssue, deleteShareIssue } = require('../controllers/shareIssueController');
 
 
 
@@ -16,7 +16,7 @@ router.put("/update/:id", updateShareIssue);
 
 router.get("/latest-price/:projectId",getLatestPrice )
 
-
+router.get('/project/:projectId', getShareIssuesByProject);
 
 
 
