@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Filter,Trash2, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign, Banknote, Landmark, Smartphone } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
+import {Eye, Search, Filter,Trash2, TrendingUp, TrendingDown, Wallet, Calendar, Plus, X, Save, Briefcase, Tag, DollarSign, Banknote, Landmark, Smartphone } from 'lucide-react'; // আইকন ব্যবহারের জন্য (ঐচ্ছিক)
 import Swal from 'sweetalert2';
+import EndPointViewDetails from './EndPointViewDetails';
 
 
 const GlobalInvestmentTable = () => {
@@ -17,7 +18,9 @@ const GlobalInvestmentTable = () => {
   const [formData, setFormData] = useState({
     projectId: '', endpointName: '', type: 'Income',paymentMethod: 'Cash', amount: '', description: '' ,date: new Date().toISOString().split('T')[0]
   });
-
+// Viwe Details
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
+  const [viewEndPoint, setViewEndPoint] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -83,6 +86,10 @@ const GlobalInvestmentTable = () => {
     }
   }
 
+  const handleView = (item) =>{
+    setViewEndPoint(item)
+    setIsDetailsOpen(true)
+  }
 
   if (loading) return (
     <div className="flex h-screen items-center justify-center bg-slate-50">
@@ -234,6 +241,11 @@ const GlobalInvestmentTable = () => {
                         </div>
                     </td>
                      <td className="px-6 py-4">
+                        <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all"
+                            onClick={() => handleView(item)}
+                            ><Eye size={16}/>
+                        </button>
+
                          <button 
                                 onClick={() => handleDelete(item._id)}
                                 className="p-2.5 bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all"
@@ -245,6 +257,12 @@ const GlobalInvestmentTable = () => {
                 ))}
                 </tbody>
             </table>
+             {/* View Modal Component */}
+                <EndPointViewDetails
+                    isOpen = {isDetailsOpen}
+                    onClose={() => setIsDetailsOpen(false)}
+                    endPoint = {viewEndPoint}
+                />
             </div>
 
             {filteredData.length === 0 && (
