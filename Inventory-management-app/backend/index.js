@@ -8,6 +8,7 @@ const projectsRoutes = require('./routes/projects')
 const sharesRoutes = require('./routes/ShareIssue')
 const shareSalesRoutes = require('./routes/shareSales')
 const endpointsRoutes = require('./routes/endPoint')
+const profitRoutes = require('./routes/profitRoutes');
 
 const app = express()
 const port = process.env.PORT || 5000
@@ -20,7 +21,7 @@ app.use('/api/projects', projectsRoutes)
 app.use('/api/shares', sharesRoutes)
 app.use('/api/share-sales', shareSalesRoutes)
 app.use('/api/endpoints', endpointsRoutes)
-
+app.use('/api/profit', profitRoutes);
 
 app.get('/', (req, res) => {
   res.send('Inventory Management app server is runing')
