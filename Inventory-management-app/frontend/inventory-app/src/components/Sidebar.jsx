@@ -2,7 +2,9 @@ import { HandCoins } from 'lucide-react';
 import React, { useState } from 'react'
 import { 
   FaHome,FaSignOutAlt , FaUserCircle, FaUsers, FaBook, FaMoneyCheckAlt, FaChevronDown, FaChevronRight, 
-  FaProjectDiagram, FaChartPie, FaCogs, FaHistory, FaTools, FaFileAlt, FaUserCog, FaBars, FaTimes 
+  FaProjectDiagram, FaChartPie, FaCogs, FaHistory, FaTools, FaFileAlt, FaUserCog, FaBars, FaTimes, 
+  FaChartLine,
+  FaCoins
 } from "react-icons/fa";
 import { Link, useLocation } from 'react-router-dom';
 
@@ -29,7 +31,7 @@ const Sidebar = () => {
                 { name: "Shares", path: "/admin-dashboard/shares", icon: <FaChartPie /> },
                 { name: "Share Sales", path: "/admin-dashboard/share-sales", icon: <HandCoins size={15}/> },
                 { name: "Endpoints", path: "/admin-dashboard/endpoints", icon: <FaCogs /> },
-                { name: "Profile Management", path: "/admin-dashboard/profiles", icon: <FaUserCog /> },
+                { name: "Profit Management", path: "/admin-dashboard/profit", icon: <FaCoins/> },
                 { name: "Reports", path: "/admin-dashboard/reports", icon: <FaFileAlt /> },
             ],
         },

@@ -11,6 +11,7 @@ import ProjectDetails from './components/ProjectDetails'
 import ShareIssueList from './components/ShareIssueList'
 import ProjectWithShares from './components/ShareSalesList'
 import GlobalInvestmentTable from './components/EndPoints'
+import ProfitManagement from './components/ProfitManagement'
 
 
 function App() {
@@ -90,9 +91,9 @@ function App() {
                   }
                 />
                 <Route
-                  path='profiles'
+                  path='profit'
                   element={
-                    <h1>Profile Management</h1>
+                    <ProfitManagement/>
                   }
                 />
                 <Route
