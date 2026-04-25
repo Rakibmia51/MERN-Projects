@@ -98,10 +98,6 @@ const calculateAndSaveMonthlyProfit = async (req, res) => {
             newCode = `PRF-${nextNumber.toString().padStart(4, '0')}`;
         }
 
-
-
-
-
         // ২. নির্দিষ্ট ওই মাসের ইনকাম এবং এক্সপেন্স বের করা
         // মাসের শুরু এবং শেষ তারিখ ঠিক করা
         const startOfMonth = new Date(year, month - 1, 1);
@@ -156,6 +152,27 @@ const calculateAndSaveMonthlyProfit = async (req, res) => {
     }
 };
 
+
+const updateProfitStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body; // Approved বা Disbursed আসবে
+
+        const updatedRecord = await ProfitRecord.findByIdAndUpdate(
+            id, 
+            { status }, 
+            { new: true }
+        );
+
+        res.status(200).json({ success: true, data: updatedRecord });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+
+
+
 // ৩. সব প্রফিট ক্যালকুলেশন হিস্ট্রি দেখা
 const getProfitHistory = async (req, res) => {
     try {
@@ -174,4 +191,20 @@ const getProfitHistory = async (req, res) => {
     }
 };
 
-module.exports = {getProfitHistory, calculateAndSaveMonthlyProfit, getProjectSummary}
+
+const getProfitDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const record = await ProfitRecord.findById(id).populate('projectId');
+        
+        if (!record) {
+            return res.status(404).json({ success: false, message: "Record not found" });
+        }
+
+        res.status(200).json({ success: true, data: record });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+module.exports = {getProfitDetails, getProfitHistory, calculateAndSaveMonthlyProfit, getProjectSummary, updateProfitStatus}

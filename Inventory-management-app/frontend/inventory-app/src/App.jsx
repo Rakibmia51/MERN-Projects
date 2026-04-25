@@ -12,6 +12,7 @@ import ShareIssueList from './components/ShareIssueList'
 import ProjectWithShares from './components/ShareSalesList'
 import GlobalInvestmentTable from './components/EndPoints'
 import ProfitManagement from './components/ProfitManagement'
+import ProfitDetailsPage from './components/ProfitDetailsPage'
 
 
 function App() {
@@ -96,6 +97,14 @@ function App() {
                     <ProfitManagement/>
                   }
                 />
+                <Route 
+                  path="profit/details/:id" 
+                  element={<ProfitDetailsPage />
+
+                  } 
+                  />
+
+
                 <Route
                   path='reports'
                   element={

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Calculator, TrendingUp, TrendingDown, DollarSign, Users, Calendar, Save, History, Banknote } from 'lucide-react';
+import { Calculator, TrendingUp, TrendingDown, DollarSign, Users, Calendar, Save, History, Banknote, Eye, CheckCircle, ShieldCheck, Send, X, Printer } from 'lucide-react';
 import { toast } from 'react-hot-toast'; // অপশনাল: নোটিফিকেশনের জন্য
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
+
+
 
 const ProfitManagement = () => {
     const [projects, setProjects] = useState([]);
@@ -11,6 +14,11 @@ const ProfitManagement = () => {
     const [summary, setSummary] = useState(null);
     const [history, setHistory] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [investors, setInvestors] = useState([]);
+    const navigate = useNavigate();
+
 
     // ১. ইনিশিয়াল ডেটা লোড (Projects & History)
     useEffect(() => {
@@ -107,15 +115,37 @@ const ProfitManagement = () => {
         }
     };
 
+    // স্ট্যাটাস আপডেট করার ফাংশন
+    const handleUpdateStatus = async (id, currentStatus) => {
+        let nextStatus = '';
+        if (currentStatus === 'Calculated') nextStatus = 'Approved';
+        else if (currentStatus === 'Approved') nextStatus = 'Disbursed';
+        else return; // Disbursed হলে আর কিছু করার নেই
+        const result = await Swal.fire({
+            title: `Change status to ${nextStatus}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.put(`http://localhost:3000/api/profit/status/${id}`, { status: nextStatus });
+                Swal.fire('Updated!', `Status is now ${nextStatus}`, 'success');
+                fetchHistory(); // টেবিল রিফ্রেশ
+            } catch (err) {
+                Swal.fire('Error!', 'Failed to update status', 'error');
+            }
+        }
+    };
+
+
     // কার্ডের ডেটা ক্যালকুলেশন
     const totalDistributions = history?.length || 0;
     const totalDisbursed = history?.reduce((sum, row) => sum + (row.netProfit || 0), 0) || 0;
     // আপনার মডেলে যদি status থাকে তবে এটি কাজ করবে, নাহলে আপাতত ০ দেখাবে
     const pendingDisbursements = history?.filter(row => row.status === 'pending').length || 0;
     const disbursedAmount = totalDisbursed; // অথবা আপনার পেইড লজিক অনুযায়ী
-
-
-
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8 bg-gray-50 min-h-screen">
@@ -168,12 +198,6 @@ const ProfitManagement = () => {
                 </div>
 
             </div>
-
-
-
-
-
-
 
             {/* Header */}
             <div className="flex justify-between items-center">
@@ -253,6 +277,7 @@ const ProfitManagement = () => {
                                 <th className="p-4">Expense</th>
                                 <th className="p-4 text-blue-600">Net Profit</th>
                                 <th className="p-4">PPS</th>
+                                <th className="p-4">Status</th>
                                 <th className="p-4">Action</th>
                             </tr>
                         </thead>
@@ -267,7 +292,48 @@ const ProfitManagement = () => {
                                     <td className="p-4 text-blue-700 font-black">{row.netProfit}</td>
                                     <td className="p-4"><span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">{row.profitPerShare}</span></td>
                                     <td className="p-4">
-                                        <button className="text-gray-400 hover:text-blue-600 transition">View</button>
+                                        <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
+                                            row.status === 'Disbursed' ? 'bg-green-100 text-green-700' :
+                                            row.status === 'Approved' ? 'bg-blue-100 text-blue-700' :
+                                            'bg-amber-100 text-amber-700'
+                                        }`}>
+                                            {row.status}
+                                        </span>
+                                    </td>
+                                    <td className="p-4">
+                                        <div className="flex items-center gap-3">
+                                            {/* Status Update Button */}
+                                            {row.status !== 'Disbursed' ? (
+                                                <button 
+                                                    onClick={() => handleUpdateStatus(row._id, row.status)}
+                                                    className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5 ${
+                                                        row.status === 'Calculated' 
+                                                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                                                        : 'bg-green-600 text-white hover:bg-green-700'
+                                                    }`}
+                                                >
+                                                    {row.status === 'Calculated' ? (
+                                                        <><ShieldCheck size={12} /> Approve</>
+                                                    ) : (
+                                                        <><Send size={12} /> Disburse</>
+                                                    )}
+                                                </button>
+                                            ) : (
+                                                /* Disbursed হয়ে গেলে একটি ছোট টিক মার্ক বা ব্যাজ */
+                                                <span className="flex items-center gap-1 text-green-600 font-bold text-[10px] uppercase bg-green-50 px-2 py-1.5 rounded-lg">
+                                                    <CheckCircle size={12} /> Finalized
+                                                </span>
+                                            )}
+
+                                            {/* View Button */}
+                                            <button 
+                                                 onClick={() => navigate(`/admin-dashboard/profit/details/${row._id}`)}
+                                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition duration-200"
+                                                title="View Details"
+                                            >
+                                                <Eye size={18} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -275,6 +341,7 @@ const ProfitManagement = () => {
                     </table>
                 </div>
             </div>
+
         </div>
     );
 };
@@ -293,5 +360,13 @@ const StatCard = ({ label, value, icon, color }) => {
         </div>
     );
 };
+
+const DetailItem = ({ label, value, color = "text-gray-800" }) => (
+    <div>
+        <p className="text-[10px] font-black text-gray-400 uppercase tracking-tighter mb-1">{label}</p>
+        <p className={`text-sm font-bold ${color}`}>{value || '---'}</p>
+    </div>
+);
+
 
 export default ProfitManagement;
