@@ -2,6 +2,7 @@ const InvestmentEndpoint = require('../models/endPoint');
 const Project = require('../models/project');
 const ProfitRecord = require('../models/ProfitRecord');
 const ShareIssue = require('../models/shareIssue');
+const shareSale = require('../models/shareSale');
 
 // ১. ড্রপডাউন থেকে প্রোজেক্ট সিলেক্ট করলে রিয়েল-টাইম সামারি দেখানো
 const getProjectSummary = async (req, res) => {
@@ -35,11 +36,11 @@ const getProjectSummary = async (req, res) => {
             if (item.type.toLowerCase() === 'expense') totalExpenses += item.amount;
         });
 
-        const shareSold = await ShareIssue.find({ projectId: projectId })
+        const shareSold = await shareSale.find({ projectId: projectId })
 
         // যেহেতু find() একটি অ্যারে দেয়, তাই আমাদের লুপ চালিয়ে সব quantity যোগ করতে হবে
         const totalActiveShares = shareSold.reduce((sum, item) => {
-            return sum + (item.totalQuantity || 0); 
+            return sum + (item.quantity || 0); 
         }, 0);
 
         // console.log(totalActiveShares);
@@ -119,9 +120,9 @@ const calculateAndSaveMonthlyProfit = async (req, res) => {
         const netProfit = totalIncome - totalExpenses;
 
         // ৩. প্রোজেক্ট থেকে শেয়ার তথ্য আনা
-        const project = await ShareIssue.find({ projectId: projectId });
+        const project = await shareSale.find({ projectId: projectId });
        // সব ইস্যুর totalQuantity যোগ করা
-        const totalShares = project.reduce((sum, item) => sum + (item.totalQuantity || 0), 0);
+        const totalShares = project.reduce((sum, item) => sum + (item.quantity || 0), 0);
         const profitPerShare = totalShares > 0 ? (netProfit / totalShares) : 0;
 
         // ৪. রেকর্ড সেভ করা
@@ -161,7 +162,7 @@ const updateProfitStatus = async (req, res) => {
         const updatedRecord = await ProfitRecord.findByIdAndUpdate(
             id, 
             { status }, 
-            { new: true }
+            { returnDocument: 'after' }
         );
 
         res.status(200).json({ success: true, data: updatedRecord });

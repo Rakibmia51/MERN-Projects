@@ -9,6 +9,7 @@ const ProfitDetailsPage = () => {
     const [record, setRecord] = useState(null);
     const [investors, setInvestors] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [project, setProjects] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -17,7 +18,10 @@ const ProfitDetailsPage = () => {
                 setRecord(res.data.data);
                 const invRes = await axios.get(`http://localhost:3000/api/shares/project/${res.data.data.projectId._id}`);
                 setInvestors(invRes.data);
-                console.log(invRes.data)
+                // console.log(invRes.data)
+                const projectDetails = await axios(`http://localhost:3000/api/projects/details/${res.data.data.projectId._id}`);
+                setProjects(projectDetails.data.data)
+                // console.log(projectDetails.data.data.shareDetails)
                 setLoading(false);
             } catch (err) {
                 console.error(err);
@@ -26,6 +30,23 @@ const ProfitDetailsPage = () => {
         };
         fetchData();
     }, [id]);
+
+// ইনভেস্টরদের আইডি অনুযায়ী গ্রুপ করা এবং শেয়ার যোগ করা
+    const groupedInvestors = investors.reduce((acc, current) => {
+        const userId = current.userId?._id;
+        if (!acc[userId]) {
+            acc[userId] = { ...current }; // নতুন ইনভেস্টর হলে অ্যাড করা হচ্ছে
+        } else {
+            acc[userId].quantity += current.quantity; // পুরাতন ইনভেস্টর হলে শেয়ার যোগ করা হচ্ছে
+            acc[userId].totalAmount += current.totalAmount; // ইনভেস্টমেন্ট অ্যামাউন্ট যোগ করা হচ্ছে
+        }
+        return acc;
+    }, {});
+
+    // অবজেক্ট থেকে আবার অ্যারেতে রূপান্তর
+    const uniqueInvestors = Object.values(groupedInvestors);
+
+
 
     if (loading) return <div className="p-10 text-center font-bold animate-pulse text-blue-600">Loading Distribution Report...</div>;
     if (!record) return <div className="p-10 text-center font-bold text-red-500">Report Not Found!</div>;
@@ -61,7 +82,8 @@ const ProfitDetailsPage = () => {
                         </div>
                         <div className="mt-8 flex gap-4">
                             <Badge label="Status" value={record.status} />
-                            <Badge label="Total Shares" value={record.totalShares} />
+                            <Badge label="Total Shares" value={project.shareDetails.totalQuantity} />
+                            <Badge label="Sold Shares" value={record.totalShares} />
                         </div>
                     </div>
 
@@ -126,12 +148,14 @@ const ProfitDetailsPage = () => {
                             <thead className="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase">
                                 <tr>
                                     <th className="px-8 py-4">Investor Identity</th>
-                                    <th className="px-8 py-4">Equity Shares</th>
+                                    <th className="px-8 py-4">% Shares</th>
                                     <th className="px-8 py-4 text-right">Individual Payout</th>
+                                     <th className="px-8 py-4">Equity Shares</th>
+                                     <th className="px-8 py-4">Shares Value</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {investors.map((inv, i) => {
+                                {uniqueInvestors.map((inv, i) => {
                                         // ওনারশিপ পার্সেন্টেজ ক্যালকুলেশন: (মেম্বার শেয়ার / প্রোজেক্টের মোট শেয়ার) * ১০০
                                         const ownershipPercent = ((inv.quantity / record.totalShares) * 100).toFixed(2);
                                         // প্রফিট অ্যামাউন্ট: মেম্বার শেয়ার * শেয়ার প্রতি প্রফিট
