@@ -32,7 +32,7 @@ const ProfitManagement = () => {
             // যদি রেসপন্স সরাসরি অ্যারে না হয়ে অবজেক্ট হয়, তবে res.data.data অথবা res.data চেক করবে
             const projectData = Array.isArray(res.data.projects) ? res.data.projects : res.data.data;
             setProjects(projectData || []); 
-            console.log(projectData)
+            // console.log(projectData)
         } catch (err) {
             console.error("Project fetch error:", err);
             setProjects([]);
@@ -58,6 +58,7 @@ const ProfitManagement = () => {
         try {
             const res = await axios.get(`http://localhost:3000/api/profit/project-summary/${selectedProject}?date=${selectedDate}`);
             setSummary(res.data.data);
+            console.log(res.data.data)
         } catch (err) {
             console.error(err);
             toast.error("Calculation failed!");
