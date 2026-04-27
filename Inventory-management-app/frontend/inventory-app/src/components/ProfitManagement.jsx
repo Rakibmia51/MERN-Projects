@@ -58,7 +58,7 @@ const ProfitManagement = () => {
         try {
             const res = await axios.get(`http://localhost:3000/api/profit/project-summary/${selectedProject}?date=${selectedDate}`);
             setSummary(res.data.data);
-            console.log(res.data.data)
+            // console.log(res.data.data)
         } catch (err) {
             console.error(err);
             toast.error("Calculation failed!");
@@ -116,30 +116,7 @@ const ProfitManagement = () => {
         }
     };
 
-    // স্ট্যাটাস আপডেট করার ফাংশন
-    // const handleUpdateStatus = async (id, currentStatus) => {
-    //     let nextStatus = '';
-    //     if (currentStatus === 'Calculated') nextStatus = 'Approved';
-    //     else if (currentStatus === 'Approved') nextStatus = 'Disbursed';
-    //     else return; // Disbursed হলে আর কিছু করার নেই
-    //     const result = await Swal.fire({
-    //         title: `Change status to ${nextStatus}?`,
-    //         icon: 'question',
-    //         showCancelButton: true,
-    //         confirmButtonText: 'Yes, update it!'
-    //     });
-
-    //     if (result.isConfirmed) {
-    //         try {
-    //             await axios.put(`http://localhost:3000/api/profit/status/${id}`, { status: nextStatus });
-    //             Swal.fire('Updated!', `Status is now ${nextStatus}`, 'success');
-    //             fetchHistory(); // টেবিল রিফ্রেশ
-    //         } catch (err) {
-    //             Swal.fire('Error!', 'Failed to update status', 'error');
-    //         }
-    //     }
-    // };
-
+    // Status Update korar jonno
     const handleUpdateStatus = async (id, currentStatus) => {
     let nextStatus = currentStatus === 'Calculated' ? 'Approved' : 'Distributed';
     
@@ -153,7 +130,7 @@ const ProfitManagement = () => {
 
     if (result.isConfirmed) {
         try {
-            const response = await axios.patch(`http://localhost:3000/api/profits/status/${id}`, {
+            const response = await axios.put(`http://localhost:3000/api/profit/status/${id}`, {
                 status: nextStatus
             });
             if (response.data.success) {
@@ -165,7 +142,81 @@ const ProfitManagement = () => {
             Swal.fire('Error', 'Failed to update status', 'error');
         }
     }
-};
+    };
+
+    // মেম্বারদের প্রফিট ডাটা সেভ করার জন্য
+    const handleDistributeProfit = async (row) => {
+        const result = await Swal.fire({
+            title: 'Confirm Payout Save?',
+            text: `Distribute profits for ${row.projectId?.projectName}?`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2563eb',
+            confirmButtonText: 'Yes, Save Records'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                // ১. এই প্রজেক্টের সব শেয়ার হোল্ডারদের ডাটা নিয়ে আসা
+                const invRes = await axios.get(`http://localhost:3000/api/shares/project/${row.projectId?._id}`);
+                const allInvestors = invRes.data;
+
+                // ২. গ্রুপিং লজিক (Details Page থেকে নেওয়া)
+                const groupedInvestors = allInvestors.reduce((acc, current) => {
+                    const userId = current.userId?._id;
+                    if (!acc[userId]) {
+                        acc[userId] = { ...current };
+                    } else {
+                        acc[userId].quantity += current.quantity;
+                    }
+                    return acc;
+                }, {});
+
+                const uniqueInvestors = Object.values(groupedInvestors);
+
+                // ৩. ফিল্টারিং লজিক (Calculation Date এর আগের ইনভেস্টর)
+                const filteredInvestors = uniqueInvestors.filter(inv => {
+                    const profitDate = new Date(row.calculationDate || row.createdAt);
+                    const purchaseDate = new Date(inv.createdAt);
+                    return purchaseDate <= profitDate;
+                });
+
+                if (filteredInvestors.length === 0) {
+                    return Swal.fire('Wait!', 'No eligible investors found for this period.', 'info');
+                }
+
+                // ৪. পেমেন্ট ডাটা তৈরি করা
+                const payoutData = filteredInvestors.map(inv => ({
+                    profitRecordId: row._id,
+                    memberId: inv.userId?._id,
+                    projectId: row.projectId?._id || row.projectId,
+                    sharesOwned: inv.quantity,
+                    profitPerShare: row.profitPerShare,
+                    totalProfitAmount: (inv.quantity * row.profitPerShare),
+                    month: row.month,
+                    year: row.year
+                }));
+
+                // ৫. ব্যাকএন্ডে API Call
+                const response = await axios.post('http://localhost:3000/api/payouts/distribute', {
+                    profitRecordId: row._id,
+                    payouts: payoutData
+                });
+
+                if (response.data.success) {
+                    Swal.fire('Saved!', 'Member profits recorded successfully.', 'success');
+                    // টেবিল স্টেট আপডেট
+                    setHistory(prev => prev.map(item => 
+                        item._id === row._id ? { ...item, status: 'Distributed' } : item
+                    ));
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error!', err.response?.data?.message || 'Failed to save payouts', 'error');
+            }
+        }
+    };
+
 
 
     // কার্ডের ডেটা ক্যালকুলেশন
@@ -328,41 +379,51 @@ const ProfitManagement = () => {
                                             {row.status}
                                         </span>
                                     </td>
-                                    <td className="p-4">
-                                        <div className="flex items-center gap-3">
-                                            {/* Status Update Button */}
-                                            {row.status !== 'Distributed' ? (
-                                                <button 
-                                                    onClick={() => handleUpdateStatus(row._id, row.status)}
-                                                    className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5 ${
-                                                        row.status === 'Calculated' 
-                                                        ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                                                        : 'bg-green-600 text-white hover:bg-green-700'
-                                                    }`}
-                                                >
-                                                    {row.status === 'Calculated' ? (
-                                                        <><ShieldCheck size={12} /> Approve</>
-                                                    ) : (
-                                                        <><Send size={12} /> Distributed</>
-                                                    )}
-                                                </button>
-                                            ) : (
-                                                /* Disbursed হয়ে গেলে একটি ছোট টিক মার্ক বা ব্যাজ */
-                                                <span className="flex items-center gap-1 text-green-600 font-bold text-[10px] uppercase bg-green-50 px-2 py-1.5 rounded-lg">
-                                                    <CheckCircle size={12} /> Finalized
-                                                </span>
-                                            )}
-
-                                            {/* View Button */}
+                                  <td className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        {/* Status Update & Save Button */}
+                                        {row.status !== 'Distributed' ? (
                                             <button 
-                                                 onClick={() => navigate(`/admin-dashboard/profit/details/${row._id}`)}
+                                                onClick={() => {
+                                                    // যদি স্ট্যাটাস Calculated হয় তবে শুধু Approve হবে
+                                                    if (row.status === 'Calculated') {
+                                                        handleUpdateStatus(row._id, row.status);
+                                                    } else {
+                                                        // যদি স্ট্যাটাস Approved হয় তবে Distributed বাটনে ক্লিক করলে সেভ হবে
+                                                        handleDistributeProfit(row); 
+                                                    }
+                                                }}
+                                                className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5 ${
+                                                    row.status === 'Calculated' 
+                                                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                                                    : 'bg-green-600 text-white hover:bg-green-700'
+                                                }`}
+                                            >
+                                                {row.status === 'Calculated' ? (
+                                                    <><ShieldCheck size={12} /> Approve</>
+                                                ) : (
+                                                    <><Send size={12} /> Distributed & Save</>
+                                                )}
+                                            </button>
+                                        ) : (
+                                            <span className="flex items-center gap-1 text-green-600 font-bold text-[10px] uppercase bg-green-50 px-2 py-1.5 rounded-lg">
+                                                <CheckCircle size={12} /> Finalized
+                                            </span>
+                                        )}
+
+                                        {/* View Details Button (Calculated ছাড়া সব স্ট্যাটাসে দেখাবে) */}
+                                        {row.status !== 'Calculated' && (
+                                            <button 
+                                                onClick={() => navigate(`/admin-dashboard/profit/details/${row._id}`)}
                                                 className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition duration-200"
                                                 title="View Details"
                                             >
                                                 <Eye size={18} />
                                             </button>
-                                        </div>
-                                    </td>
+                                        )}
+                                    </div>
+                                  </td>
+
                                 </tr>
                             ))}
                         </tbody>
