@@ -22,7 +22,7 @@ const ProfitDetailsPage = () => {
                 // console.log(res.data.data)
                 const invRes = await axios.get(`http://localhost:3000/api/shares/project/${res.data.data.projectId._id}`);
                 setInvestors(invRes.data);
-                console.log(invRes.data)
+                // console.log(invRes.data)
                 const projectDetails = await axios(`http://localhost:3000/api/projects/details/${res.data.data.projectId._id}`);
                 setProjects(projectDetails.data.data)
                 // console.log(projectDetails.data.data.shareDetails)
