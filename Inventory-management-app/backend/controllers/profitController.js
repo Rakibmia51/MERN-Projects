@@ -208,4 +208,7 @@ const getProfitDetails = async (req, res) => {
     }
 };
 
+
+
+
 module.exports = {getProfitDetails, getProfitHistory, calculateAndSaveMonthlyProfit, getProjectSummary, updateProfitStatus}

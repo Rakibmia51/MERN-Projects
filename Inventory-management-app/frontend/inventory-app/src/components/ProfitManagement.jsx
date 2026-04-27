@@ -117,28 +117,55 @@ const ProfitManagement = () => {
     };
 
     // স্ট্যাটাস আপডেট করার ফাংশন
-    const handleUpdateStatus = async (id, currentStatus) => {
-        let nextStatus = '';
-        if (currentStatus === 'Calculated') nextStatus = 'Approved';
-        else if (currentStatus === 'Approved') nextStatus = 'Disbursed';
-        else return; // Disbursed হলে আর কিছু করার নেই
-        const result = await Swal.fire({
-            title: `Change status to ${nextStatus}?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, update it!'
-        });
+    // const handleUpdateStatus = async (id, currentStatus) => {
+    //     let nextStatus = '';
+    //     if (currentStatus === 'Calculated') nextStatus = 'Approved';
+    //     else if (currentStatus === 'Approved') nextStatus = 'Disbursed';
+    //     else return; // Disbursed হলে আর কিছু করার নেই
+    //     const result = await Swal.fire({
+    //         title: `Change status to ${nextStatus}?`,
+    //         icon: 'question',
+    //         showCancelButton: true,
+    //         confirmButtonText: 'Yes, update it!'
+    //     });
 
-        if (result.isConfirmed) {
-            try {
-                await axios.put(`http://localhost:3000/api/profit/status/${id}`, { status: nextStatus });
+    //     if (result.isConfirmed) {
+    //         try {
+    //             await axios.put(`http://localhost:3000/api/profit/status/${id}`, { status: nextStatus });
+    //             Swal.fire('Updated!', `Status is now ${nextStatus}`, 'success');
+    //             fetchHistory(); // টেবিল রিফ্রেশ
+    //         } catch (err) {
+    //             Swal.fire('Error!', 'Failed to update status', 'error');
+    //         }
+    //     }
+    // };
+
+    const handleUpdateStatus = async (id, currentStatus) => {
+    let nextStatus = currentStatus === 'Calculated' ? 'Approved' : 'Distributed';
+    
+    const result = await Swal.fire({
+        title: `Change status to ${nextStatus}?`,
+        text: "You can manage member-wise profits in the details page after approval.",
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#2563eb'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await axios.patch(`http://localhost:3000/api/profits/status/${id}`, {
+                status: nextStatus
+            });
+            if (response.data.success) {
+                // স্টেট আপডেট করুন যাতে টেবিল রিফ্রেশ হয়
+                setHistory(prev => prev.map(item => item._id === id ? { ...item, status: nextStatus } : item));
                 Swal.fire('Updated!', `Status is now ${nextStatus}`, 'success');
-                fetchHistory(); // টেবিল রিফ্রেশ
-            } catch (err) {
-                Swal.fire('Error!', 'Failed to update status', 'error');
             }
+        } catch (err) {
+            Swal.fire('Error', 'Failed to update status', 'error');
         }
-    };
+    }
+};
 
 
     // কার্ডের ডেটা ক্যালকুলেশন
@@ -294,7 +321,7 @@ const ProfitManagement = () => {
                                     <td className="p-4"><span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">{row.profitPerShare}</span></td>
                                     <td className="p-4">
                                         <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase ${
-                                            row.status === 'Disbursed' ? 'bg-green-100 text-green-700' :
+                                            row.status === 'Distributed' || row.status === 'Distributed' ? 'bg-green-100 text-green-700' :
                                             row.status === 'Approved' ? 'bg-blue-100 text-blue-700' :
                                             'bg-amber-100 text-amber-700'
                                         }`}>
@@ -304,7 +331,7 @@ const ProfitManagement = () => {
                                     <td className="p-4">
                                         <div className="flex items-center gap-3">
                                             {/* Status Update Button */}
-                                            {row.status !== 'Disbursed' ? (
+                                            {row.status !== 'Distributed' ? (
                                                 <button 
                                                     onClick={() => handleUpdateStatus(row._id, row.status)}
                                                     className={`text-[10px] font-black uppercase px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1.5 ${
@@ -316,7 +343,7 @@ const ProfitManagement = () => {
                                                     {row.status === 'Calculated' ? (
                                                         <><ShieldCheck size={12} /> Approve</>
                                                     ) : (
-                                                        <><Send size={12} /> Disburse</>
+                                                        <><Send size={12} /> Distributed</>
                                                     )}
                                                 </button>
                                             ) : (

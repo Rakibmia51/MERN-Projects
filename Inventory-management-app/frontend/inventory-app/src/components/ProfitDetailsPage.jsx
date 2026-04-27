@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { ArrowLeft, Users, TrendingUp, TrendingDown, Info, ShieldCheck, FileText, Calendar, DollarSign } from 'lucide-react';
+import Swal from 'sweetalert2';
+
 
 const ProfitDetailsPage = () => {
     const { id } = useParams();
@@ -10,15 +12,17 @@ const ProfitDetailsPage = () => {
     const [investors, setInvestors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [project, setProjects] = useState([]);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const res = await axios.get(`http://localhost:3000/api/profit/details/${id}`);
                 setRecord(res.data.data);
+                // console.log(res.data.data)
                 const invRes = await axios.get(`http://localhost:3000/api/shares/project/${res.data.data.projectId._id}`);
                 setInvestors(invRes.data);
-                // console.log(invRes.data)
+                console.log(invRes.data)
                 const projectDetails = await axios(`http://localhost:3000/api/projects/details/${res.data.data.projectId._id}`);
                 setProjects(projectDetails.data.data)
                 // console.log(projectDetails.data.data.shareDetails)
@@ -46,6 +50,62 @@ const ProfitDetailsPage = () => {
     // অবজেক্ট থেকে আবার অ্যারেতে রূপান্তর
     const uniqueInvestors = Object.values(groupedInvestors);
 
+    // ১. প্রথমে ফিল্টার করে একটি নতুন ভেরিয়েবলে রাখুন
+   const filteredInvestors = uniqueInvestors.filter(inv => {
+    // record.calculationDate ব্যবহার করা বেশি নিরাপদ
+    const profitDate = new Date(record.calculationDate || record.createdAt);
+    const purchaseDate = new Date(inv.createdAt);
+    
+    return purchaseDate <= profitDate;
+    });
+
+
+    // ২. এখন এর লেংথ বের করুন
+    const count = filteredInvestors.length;
+
+    // মেম্বারদের প্রফিট ডাটা সেভ করার জন্য
+    const handleDistributeProfit = async () => {
+        const result = await Swal.fire({
+            title: 'Confirm Payout Save?',
+            text: "This will store profit records for each eligible member in the database.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#2563eb',
+            confirmButtonText: 'Yes, Save Records'
+        });
+
+        if (result.isConfirmed) {
+            setIsSaving(true);
+            try {
+                // ১. আপনার তৈরি করা filteredInvestors ব্যবহার করছি (যাদের ক্যালকুলেশন ডেট এর আগে শেয়ার কেনা)
+                const payoutData = filteredInvestors.map(inv => ({
+                    profitRecordId: record._id,
+                    memberId: inv.userId?._id,
+                    projectId: record.projectId?._id || record.projectId,
+                    sharesOwned: inv.quantity,
+                    profitPerShare: record.profitPerShare,
+                    totalProfitAmount: (inv.quantity * record.profitPerShare),
+                    month: record.month,
+                    year: record.year
+                }));
+
+                // ২. ব্যাকএন্ডে API Call (এন্ডপয়েন্ট আপনার রুট অনুযায়ী চেক করে নিন)
+                const response = await axios.post('http://localhost:3000/api/payouts/distribute', {
+                    profitRecordId: record._id,
+                    payouts: payoutData
+                });
+
+                if (response.data.success) {
+                    Swal.fire('Saved!', 'Individual member profits have been recorded.', 'success');
+                    setRecord({ ...record, status: 'Distributed' }); // UI আপডেট
+                }
+            } catch (err) {
+                Swal.fire('Error!', err.response?.data?.message || 'Failed to save payouts', 'error');
+            } finally {
+                setIsSaving(false);
+            }
+        }
+    };
 
 
     if (loading) return <div className="p-10 text-center font-bold animate-pulse text-blue-600">Loading Distribution Report...</div>;
@@ -140,7 +200,7 @@ const ProfitDetailsPage = () => {
                         </div>
                         <div className="text-right">
                             <p className="text-[10px] font-black text-gray-400 uppercase">Active Holders</p>
-                            <p className="text-lg font-black text-gray-800">{investors.length}</p>
+                            <p className="text-lg font-black text-gray-800">{count}</p>
                         </div>
                     </div>
                     <div className="overflow-x-auto">
@@ -155,7 +215,17 @@ const ProfitDetailsPage = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-50">
-                                {uniqueInvestors.map((inv, i) => {
+                                {uniqueInvestors
+                                .filter(inv => {
+                                        // প্রফিট ডিস্ট্রিবিউশন ডেট (record.date অথবা record.createdAt)
+                                        const profitDate = new Date(record.date || record.createdAt);
+                                        // মেম্বারের শেয়ার কেনার ডেট
+                                        const purchaseDate = new Date(inv.createdAt); 
+
+                                        // শুধুমাত্র প্রফিট ডেট-এর আগে  যারা শেয়ার কিনেছে তাদের দেখাবে
+                                        return purchaseDate < profitDate;
+                                    })
+                                .map((inv, i) => {
                                         // ওনারশিপ পার্সেন্টেজ ক্যালকুলেশন: (মেম্বার শেয়ার / প্রোজেক্টের মোট শেয়ার) * ১০০
                                         const ownershipPercent = ((inv.quantity / record.totalShares) * 100).toFixed(2);
                                         // প্রফিট অ্যামাউন্ট: মেম্বার শেয়ার * শেয়ার প্রতি প্রফিট
@@ -208,6 +278,26 @@ const ProfitDetailsPage = () => {
                         </table>
                     </div>
                 </div>
+                {/* Action Button Section */}
+                {record.status !== 'Distributed' && (
+                    <div className="flex justify-end pt-4">
+                        <button
+                            onClick={handleDistributeProfit}
+                            disabled={isSaving}
+                            className="flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-black shadow-xl shadow-blue-100 transition-all active:scale-95 disabled:bg-gray-400"
+                        >
+                            {isSaving ? (
+                                "Processing..."
+                            ) : (
+                                <>
+                                    <ShieldCheck size={20} />
+                                    SAVE MEMBER PROFITS
+                                </>
+                            )}
+                        </button>
+                    </div>
+                )}
+
 
                 {/* 4. Integrity & Security Footer */}
                 <div className="bg-blue-600 p-8 rounded-[2rem] text-white flex flex-col md:flex-row justify-between items-center gap-6">

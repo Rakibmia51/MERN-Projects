@@ -20,7 +20,7 @@ const profitSchema = new mongoose.Schema({
     },
     status: { 
         type: String, 
-        enum: ['Calculated', 'Approved', 'Disbursed'], 
+        enum: ['Calculated', 'Approved', 'Distributed'], 
         default: 'Calculated' 
     },
     notes: { type: String },
