@@ -13,6 +13,7 @@ import ProjectWithShares from './components/ShareSalesList'
 import GlobalInvestmentTable from './components/EndPoints'
 import ProfitManagement from './components/ProfitManagement'
 import ProfitDetailsPage from './components/ProfitDetailsPage'
+import Profile from './components/Profile'
 
 
 function App() {
@@ -37,7 +38,7 @@ function App() {
                 <Route
                   path='profile'
                   element={
-                    <h1>My Account</h1>
+                    <Profile/>
                   }
                 />
                  <Route

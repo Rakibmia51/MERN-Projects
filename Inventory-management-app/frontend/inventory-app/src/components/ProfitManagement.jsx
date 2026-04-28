@@ -45,6 +45,7 @@ const ProfitManagement = () => {
             // আপনার ব্যাকএন্ড অনুযায়ী res.data.data চেক করা হচ্ছে
             const historyData = res.data.data || res.data;
             setHistory(Array.isArray(historyData) ? historyData : []);
+            console.log(res.data.data)
         } catch (err) {
             console.error("History fetch error:", err);
             setHistory([]);
@@ -221,10 +222,21 @@ const ProfitManagement = () => {
 
     // কার্ডের ডেটা ক্যালকুলেশন
     const totalDistributions = history?.length || 0;
-    const totalDisbursed = history?.reduce((sum, row) => sum + (row.netProfit || 0), 0) || 0;
-    // আপনার মডেলে যদি status থাকে তবে এটি কাজ করবে, নাহলে আপাতত ০ দেখাবে
-    const pendingDisbursements = history?.filter(row => row.status === 'pending').length || 0;
-    const disbursedAmount = totalDisbursed; // অথবা আপনার পেইড লজিক অনুযায়ী
+
+     // আপনার মডেলে যদি status থাকে তবে এটি কাজ করবে, নাহলে আপাতত ০ দেখাবে
+    const pendingDisbursements = history?.filter(row => row.status === 'Calculated').length || 0;
+
+    const totalDisbursed = history
+        ?.filter(row => row.status === 'Approved')
+        .length || 0;
+        
+
+    const disbursedAmount = history
+        ?.filter(row => row.status === 'Distributed')
+        .reduce((sum, row)=> sum + (Number(row.netProfit) || 0), 0) || 0;
+        
+   
+    // const disbursedAmount = history?.reduce((sum, row) => sum + (row.netProfit || 0), 0) || 0;
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-8 bg-gray-50 min-h-screen">
@@ -243,25 +255,25 @@ const ProfitManagement = () => {
                     </div>
                 </div>
 
-                {/* Total Disbursed */}
-                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 transition-transform hover:scale-105 cursor-default">
-                    <div className="p-3 bg-green-50 text-green-600 rounded-xl">
-                        <DollarSign size={20} />
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">Total Disbursed</p>
-                        <h3 className="text-xl font-black text-gray-800">{totalDisbursed.toLocaleString()}</h3>
-                    </div>
-                </div>
-
                 {/* Pending Disbursements */}
                 <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 transition-transform hover:scale-105 cursor-default">
                     <div className="p-3 bg-amber-50 text-amber-600 rounded-xl">
                         <History size={20} />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">Pending Disb.</p>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">Calculated.</p>
                         <h3 className="text-xl font-black text-gray-800">{pendingDisbursements}</h3>
+                    </div>
+                </div>
+
+                  {/* Total Disbursed */}
+                <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 transition-transform hover:scale-105 cursor-default">
+                    <div className="p-3 bg-green-50 text-green-600 rounded-xl">
+                        <ShieldCheck size={20} />
+                    </div>
+                    <div>
+                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-tight">Approved</p>
+                        <h3 className="text-xl font-black text-gray-800">{totalDisbursed.toLocaleString()}</h3>
                     </div>
                 </div>
 

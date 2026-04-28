@@ -1,3 +1,4 @@
+const shareSale = require("../models/shareSale");
 const User = require("../models/user");
 const bcrypt= require('bcrypt')
 
@@ -132,6 +133,19 @@ const deleteUser = async(req, res)=>{
         });
         }
 
+         // চেক করুন এই প্রোজেক্টের কোনো শেয়ার বিক্রি (Sale) হয়েছে কি না
+        // আপনার Share Sale ডাটাতে projectId ফিল্ডটি আছে, তাই আমরা এটি ব্যবহার করছি
+        const hasSales = await shareSale.findOne({ userId: id });
+
+        if (hasSales) {
+            return res.status(400).json({
+                success: false,
+                message: "Cannot delete! Members have already purchased shares from this project's issuance."
+            });
+        }
+
+
+
         await User.findByIdAndDelete(id)
         return res.json({
         success: true,
@@ -237,6 +251,41 @@ const memberSearch = async (req, res) => {
     }
 };
 
+const changePassword = async (req, res) => {
+    try {
+        const userId = req.user._id; // Middleware থেকে পাওয়া আইডি
+        const { oldPassword, newPassword } = req.body;
+
+        // ১. ইউজারকে খুঁজে বের করা (পাসওয়ার্ড চেক করার জন্য পাসওয়ার্ড ফিল্ডসহ)
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // ২. পুরাতন পাসওয়ার্ড চেক করা
+        const isMatch = await bcrypt.compare(oldPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Old password is incorrect" });
+        }
+
+        // ৩. নতুন পাসওয়ার্ড হ্যাশ করা
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // ৪. ডাটাবেসে নতুন পাসওয়ার্ড আপডেট করা
+        user.password = hashedPassword;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Password changed successfully"
+        });
+
+    } catch (error) {
+        console.error("Change Password Error:", error);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
 
 
-module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser, statusUpdate, memberSearch}
+module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser, statusUpdate, memberSearch, changePassword}

@@ -223,6 +223,16 @@ const deleteProject = async (req, res) => {
         });
     }
 
+     // ২. চেক করুন এই প্রজেক্টের সাথে কোনো শেয়ার কেনা আছে কিনা
+    // (আপনার মডেলের নাম অনুযায়ী Shares/Share ব্যবহার করুন)
+    const hasShares = await ShareIssue.findOne({ projectId: id });
+    if (hasShares) {
+      return res.status(400).json({
+        success: false,
+        message: "This project cannot be deleted because Shares have already Issued shares in it!",
+      });
+    }
+
     await Projects.findByIdAndDelete(id);
         return res.status(200).json({
             success: true, 
