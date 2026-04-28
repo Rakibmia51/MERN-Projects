@@ -1,5 +1,5 @@
 const express = require('express');
-const { addUser, getUsers, deleteUser, getProfile, updateUserProfile, updateUser, statusUpdate, memberSearch } = require('../controllers/usersController');
+const { addUser, getUsers, deleteUser, getProfile, updateUserProfile, updateUser, statusUpdate, memberSearch, changePassword } = require('../controllers/usersController');
 const authMiddleware = require('../middleware/authMiddleware');
 
 
@@ -13,8 +13,9 @@ router.put("/update/:id", updateUser);
 router.patch('/status/:id', statusUpdate)
 
 router.get("/profile",authMiddleware, getProfile);
-// router.put("/profile",authMiddleware, updateUserProfile);
-// নতুন রাউট
+// পাসওয়ার্ড পরিবর্তনের জন্য
+router.put('/change-password', authMiddleware, changePassword);
+
 router.get("/member-search/:code", memberSearch);
 
 

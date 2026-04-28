@@ -71,8 +71,14 @@ const MemberList = () => {
                         setMembers(members.filter(member => member._id !== id));
                         Swal.fire('Deleted!', 'Member has been deleted.', 'success');
                     }
-                } catch (error) {
-                    Swal.fire('Error', 'Failed to delete member', 'error');
+                } catch (err) {
+                   const errorMessage = err.response?.data?.message || 'Something went wrong!';
+                    Swal.fire({
+                        title: 'Access Denied!',
+                        text: errorMessage,
+                        icon: 'error',
+                        confirmButtonColor: '#2563eb'
+                    });
                 }
             }
         });

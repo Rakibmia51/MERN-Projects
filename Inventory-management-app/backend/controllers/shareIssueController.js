@@ -93,15 +93,49 @@ const updateShareIssue = async (req, res) => {
     }
 };
 
-// শেয়ার ইস্যু ডিলিট করা
+
 const deleteShareIssue = async (req, res) => {
     try {
-        await ShareIssue.findByIdAndDelete(req.params.id);
-        res.status(200).json({ success: true, message: "Deleted successfully" });
+        const { id } = req.params; // এটি Share Issue এর _id
+
+        // ১. প্রথমে Share Issue রেকর্ডটি খুঁজুন
+        const issue = await ShareIssue.findById(id);
+        if (!issue) {
+            return res.status(404).json({
+                success: false,
+                message: "Share Issue not found!"
+            });
+        }
+
+        // ২. চেক করুন এই প্রোজেক্টের কোনো শেয়ার বিক্রি (Sale) হয়েছে কি না
+        // আপনার Share Sale ডাটাতে projectId ফিল্ডটি আছে, তাই আমরা এটি ব্যবহার করছি
+        const hasSales = await shareSale.findOne({ projectId: issue.projectId });
+
+        if (hasSales) {
+            return res.status(400).json({
+                success: false,
+                message: "Cannot delete! Members have already purchased shares from this project's issuance."
+            });
+        }
+
+        // ৩. যদি কোনো সেল না থাকে, তবে ডিলিট করুন
+        await ShareIssue.findByIdAndDelete(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Share Issuance deleted successfully."
+        });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
     }
 };
+
+
+
 
 
 const getLatestPrice = async (req, res) => {

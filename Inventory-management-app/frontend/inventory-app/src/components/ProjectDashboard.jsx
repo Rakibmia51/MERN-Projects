@@ -105,7 +105,13 @@ const ProjectList = () => {
           Swal.fire('Deleted!', 'Project has been removed.', 'success');
         }
       } catch (err) {
-        Swal.fire('Error!', 'Could not delete the project.', 'error');
+        const errorMessage = err.response?.data?.message || 'Something went wrong!';
+        Swal.fire({
+          title: 'Access Denied!',
+          text: errorMessage,
+          icon: 'error',
+          confirmButtonColor: '#2563eb'
+        });
       }
     }
   };

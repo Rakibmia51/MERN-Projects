@@ -96,19 +96,30 @@ const handleSubmit = async (e) => {
     const handleDelete = async (id) => {
         const result = await Swal.fire({
             title: 'Are you sure?',
+            text: "You won't be able to revert this!",
             icon: 'warning',
             showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
             confirmButtonText: 'Yes, delete it!'
             });
             if (result.isConfirmed) {
                 try {
-                    await axios.delete(`http://localhost:3000/api/shares/delete/${id}`, {
+                    const response = await axios.delete(`http://localhost:3000/api/shares/delete/${id}`, {
                         headers: { Authorization: `Bearer ${localStorage.getItem("pos-token")}` }
                     });
+                   if (response.data.success) {
                     setIssues(issues.filter(i => i._id !== id));
-                    Swal.fire('Deleted!', '', 'success');
+                    Swal.fire('Deleted!', response.data.message || 'ShareIssue has been removed.', 'success');
+                }
                 } catch (err) {
-                    Swal.fire('Error', 'Delete failed', 'error');
+                     const errorMessage = err.response?.data?.message || 'Something went wrong!';
+                    Swal.fire({
+                      title: 'Access Denied!',
+                      text: errorMessage,
+                      icon: 'error',
+                      confirmButtonColor: '#2563eb'
+                    });
                 }
             }
     };

@@ -179,7 +179,7 @@ const getProfitHistory = async (req, res) => {
     try {
         const history = await ProfitRecord.find()
             .populate('projectId', 'projectName')
-            .sort({ year: -1, month: -1 }); // তারিখের পাশাপাশি বছর ও মাস দিয়ে সর্ট করা আরও নিখুঁত
+            .sort({createdAt: -1 }); // তারিখের পাশাপাশি বছর ও মাস দিয়ে সর্ট করা আরও নিখুঁত
             
         // যদি হিস্ট্রি খালি থাকে তবে একটি মেসেজসহ পাঠানো ভালো
         if (!history || history.length === 0) {
