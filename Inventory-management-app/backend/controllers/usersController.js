@@ -93,8 +93,20 @@ const addUser =async(req, res)=>{
 
 const getUsers = async (req, res)=>{
     try {
-        const users = await User.find();
-        return res.status(200).json({success:true, users})
+        const users = await User.find().lean();
+
+
+        const totalMember = users.length;
+        const activeMember = users.filter(user => user.status === 'active').length;
+        const inactiveMember = users.filter(user => user.status === 'inactive').length;
+        
+        return res.status(200).json({
+            success:true,
+            totalMember,
+            activeMember,
+            inactiveMember,
+            users
+        })
     } catch (error) {
          console.error('Error fatching users', error)
          return res.status(500).json({success: false, message: 'Server Error in getting users'})
@@ -118,7 +130,6 @@ const getProfile = async(req, res)=>{
                 });
     }
 }
-
 
 const deleteUser = async(req, res)=>{
     try {

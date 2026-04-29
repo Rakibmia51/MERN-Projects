@@ -38,6 +38,10 @@ const getProjects =async(req, res)=>{
     try {
         const projects = await Projects.find()
             .sort({ createdAt: -1 });
+        
+        const totalProject = projects.length;
+        const activeProject = projects.filter(project => project.status === 'Active').length;
+        const pendingProject = projects.filter(project => project.status === 'Pending').length;
 
         const shareIssue = await ShareIssue.find()
                     .populate('projectId', 'totalQuantity pricePerShare totalValue')
@@ -68,7 +72,10 @@ const getProjects =async(req, res)=>{
         
 
         return res.status(200).json({
-            success:true, 
+            success:true,
+            totalProject,
+            activeProject,
+            pendingProject, 
             projects,
             shareIssue,
              overallTotals: {
@@ -104,13 +111,13 @@ const projectAllDetails = async (req, res) => {
         const projects = await Projects.find().lean();
         const shareIssues = await ShareIssue.find().lean();
 
+
         const result = projects.map(project => {
             // shareIssue এর ভেতর projectId একটি অবজেক্ট, তাই ._id দিয়ে চেক করতে হবে
             const share = shareIssues.find(s => 
                 s.projectId?._id?.toString() === project._id.toString() || 
                 s.projectId?.toString() === project._id.toString()
             );
-      
             return {
                 ...project,
                 shareDetails: share || null
