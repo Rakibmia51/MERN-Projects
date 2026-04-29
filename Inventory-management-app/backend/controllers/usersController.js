@@ -299,4 +299,5 @@ const changePassword = async (req, res) => {
 };
 
 
+
 module.exports = {addUser, getUsers, deleteUser, getProfile, updateUser, statusUpdate, memberSearch, changePassword}

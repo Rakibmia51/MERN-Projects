@@ -54,7 +54,6 @@ const createShareSale = async (req, res) => {
     }
 };
 
-
 const getAllShareSales = async (req, res) => {
     try {
         const shareSales = await ShareSale.find()
@@ -87,6 +86,7 @@ const getAllShareSales = async (req, res) => {
         });
     }
 };
+
 
 
 
