@@ -1,13 +1,14 @@
 const express = require('express');
 
 const authMiddleware = require('../middleware/authMiddleware');
-const { createShareSale, getAllShareSales} = require('../controllers/shareSaleController');
+const { createShareSale, getAllShareSales } = require('../controllers/shareSaleController');
 
 
 const router = express.Router();
 
 router.post("/create",authMiddleware, createShareSale);
 router.get("/", getAllShareSales);
+
 
 
 // router.get('/latest-price/:projectId', getLatestPriceByProject)

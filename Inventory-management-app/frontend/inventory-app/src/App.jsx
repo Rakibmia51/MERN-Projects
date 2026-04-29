@@ -15,7 +15,7 @@ import ProfitManagement from './components/ProfitManagement'
 import ProfitDetailsPage from './components/ProfitDetailsPage'
 import Profile from './components/Profile'
 import MainDashboard from './components/MainDashboard'
-
+import MemberDashboard from './components/memberComponents/MemberDashboard'
 
 function App() {
   
@@ -114,7 +114,7 @@ function App() {
                   }
                 />
                  <Route
-                  path='system'
+                  path='system-settings'
                   element={
                     <h1>System Settings</h1>
                   }
@@ -131,7 +131,7 @@ function App() {
               >
               <Route
                   index
-                  element={<h1>Member DashBoard</h1>}
+                  element={<MemberDashboard/>}
               />
               <Route
                   path='profile'
