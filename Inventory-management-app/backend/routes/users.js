@@ -6,7 +6,7 @@ const authMiddleware = require('../middleware/authMiddleware');
 const router = express.Router();
 
 router.post("/add", addUser);
-router.get("/", getUsers);
+router.get("/",authMiddleware, getUsers);
 router.delete("/delete/:id",authMiddleware, deleteUser);
 router.put("/update/:id", updateUser);
 

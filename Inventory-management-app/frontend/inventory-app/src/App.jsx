@@ -14,6 +14,7 @@ import GlobalInvestmentTable from './components/EndPoints'
 import ProfitManagement from './components/ProfitManagement'
 import ProfitDetailsPage from './components/ProfitDetailsPage'
 import Profile from './components/Profile'
+import MainDashboard from './components/MainDashboard'
 
 
 function App() {
@@ -33,7 +34,7 @@ function App() {
               >
                 <Route
                   index
-                  element={<h1>Summary of dashboard</h1>}
+                  element={<MainDashboard/>}
                 />
                 <Route
                   path='profile'
@@ -53,12 +54,7 @@ function App() {
                     <h1>Ledger</h1>
                   }
                 />
-                 {/* <Route
-                  path='fees'
-                  element={
-                    <h1>Subscription Fees</h1>
-                  }
-                /> */}
+                
                  <Route
                   path='projects'
                   element={
@@ -105,7 +101,6 @@ function App() {
                   } 
                   />
 
-
                 <Route
                   path='reports'
                   element={
@@ -127,7 +122,49 @@ function App() {
                 
               </Route>
               <Route path='/boardMember-dashboard' element={<h1>BoardMember Dashboard</h1>}/>
-              <Route path='/member-dashboard' element={<h1>Member Dashboard</h1>}/>
+              <Route path='/member-dashboard' 
+                element={
+                <ProtectedRoutes requireRole={["member"]}>
+                     <Dashboard/>
+                  </ProtectedRoutes>
+                }
+              >
+              <Route
+                  index
+                  element={<h1>Member DashBoard</h1>}
+              />
+              <Route
+                  path='profile'
+                  element={
+                      <Profile/>
+                  }
+                />
+                <Route
+                  path='ledger'
+                  element={
+                    <h1>My Ledger</h1>
+                  }
+                />
+                <Route
+                  path='projects'
+                  element={
+                   <h1>My Projects</h1>
+                  }
+                />
+                 <Route
+                  path='shares'
+                  element={
+                    <h1>My Shares</h1>
+                  }
+                />
+                <Route
+                  path='profit'
+                  element={
+                   <h1>My Profit</h1>
+                  }
+                />
+
+             </Route>
               <Route path='/login' element={<Login/>}/>
               <Route path='/unauthorized' element={<h1>Unauthorized</h1>}/>
 
