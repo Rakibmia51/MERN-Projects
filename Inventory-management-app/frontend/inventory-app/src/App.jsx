@@ -16,6 +16,7 @@ import ProfitDetailsPage from './components/ProfitDetailsPage'
 import Profile from './components/Profile'
 import MainDashboard from './components/MainDashboard'
 import MemberDashboard from './components/memberComponents/MemberDashboard'
+import MemberShares from './components/memberComponents/MemberShares'
 
 function App() {
   
@@ -154,7 +155,7 @@ function App() {
                  <Route
                   path='shares'
                   element={
-                    <h1>My Shares</h1>
+                    <MemberShares/>
                   }
                 />
                 <Route
