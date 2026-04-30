@@ -57,7 +57,7 @@ const createShareSale = async (req, res) => {
 const getAllShareSales = async (req, res) => {
     try {
         const shareSales = await ShareSale.find()
-            .populate('projectId', 'projectName') // Get project name
+            .populate('projectId', 'projectName projectCode') // Get project name
             .populate('userId', 'fullName memberCode') // Get member details
             .populate('soldBy', 'fullName memberCode email') // Populating Admin Name
             .sort({ createdAt: -1 }); // Newest first
