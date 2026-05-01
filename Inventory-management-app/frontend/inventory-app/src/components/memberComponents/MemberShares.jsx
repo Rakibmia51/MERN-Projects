@@ -7,6 +7,8 @@ const MemberShares = () => {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [sales, setSales] = useState(null);
+  const [projectShares, setProjectShares] = useState({});
+
 
   useEffect(() => {
     const fetchPortfolio = async () => {
@@ -32,6 +34,16 @@ const MemberShares = () => {
           setSales(resShareSales.data.shareSales);
           console.log(resShareSales.data.shareSales)
         }
+         // ২. নতুন: প্রোজেক্টের টোটাল শেয়ার ডাটা ফেচ করা
+        const resTotalShares = await axios.get(`http://localhost:3000/api/shares`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("pos-token")}` }
+        });
+        // প্রজেক্ট আইডি অনুযায়ী টোটাল শেয়ার ম্যাপ করা
+        const shareMap = {};
+        resTotalShares.data.shares.forEach(item => {
+          shareMap[item.projectId?._id] = item.totalQuantity;
+        });
+         setProjectShares(shareMap);
 
       } catch (error) {
         console.error("Portfolio fetch error", error);
@@ -57,6 +69,7 @@ const projectWiseData = sales?.reduce((acc, curr) => {
                     projectCode: curr.projectId?.projectCode || "N/A",
                     totalShares: 0,
                     totalInvestment: 0,
+                    projectTotalQty: projectShares[pId] || 0 
                 };
             }
             acc[pId].totalShares += curr.quantity || 0;
@@ -66,7 +79,13 @@ const projectWiseData = sales?.reduce((acc, curr) => {
     return acc;
 }, {});
 
-  const projectList = Object.values(projectWiseData || {});
+const projectList = Object.values(projectWiseData || {}).map(item => ({
+  ...item,
+  // ওনারশিপ ক্যালকুলেশন: (আমার শেয়ার / প্রজেক্টের মোট শেয়ার) * ১০০
+  ownership: item.projectTotalQty > 0 
+    ? ((item.totalShares / item.projectTotalQty) * 100).toFixed(2) 
+    : "0.00"
+}));
   
 
   if (loading) return <div className="p-10 text-center font-bold">Loading Portfolio...</div>;
@@ -116,7 +135,7 @@ const projectWiseData = sales?.reduce((acc, curr) => {
         />
         <StatCard 
           title="Average Share Price" 
-          value={`৳ ${avgPrice}`} 
+          value={`৳ ${avgPrice.toFixed(2)}`} 
           icon={<Tag className="text-orange-600" />} 
           bg="bg-orange-50"
         />
@@ -135,6 +154,7 @@ const projectWiseData = sales?.reduce((acc, curr) => {
                 <th className="p-4">Project Name</th>
                 <th className="p-4">Project Code</th>
                 <th className="p-4 text-center">Total Shares</th>
+                 <th className="p-4 text-center">Ownership %</th> 
                 <th className="p-4 text-right">Investment Value</th>
               </tr>
             </thead>
@@ -146,6 +166,7 @@ const projectWiseData = sales?.reduce((acc, curr) => {
                     <span className="bg-gray-100 px-2 py-1 rounded text-xs font-bold">{item.projectCode}</span>
                   </td>
                   <td className="p-4 font-black text-center text-indigo-600">{item.totalShares}</td>
+                   <td className="p-4 text-center font-black text-orange-600">{item.ownership}%</td>
                   <td className="p-4 font-black text-right text-emerald-600">৳ {item.totalInvestment.toLocaleString()}</td>
                 </tr>
               )) : (
