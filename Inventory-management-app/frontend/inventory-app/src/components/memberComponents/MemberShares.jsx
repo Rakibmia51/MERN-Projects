@@ -83,7 +83,7 @@ const projectList = Object.values(projectWiseData || {}).map(item => ({
   ...item,
   // ওনারশিপ ক্যালকুলেশন: (আমার শেয়ার / প্রজেক্টের মোট শেয়ার) * ১০০
   ownership: item.projectTotalQty > 0 
-    ? ((item.totalShares / item.projectTotalQty) * 100).toFixed(2) 
+    ? ((item.totalShares / item.projectTotalQty) * 100).toFixed(0) 
     : "0.00"
 }));
   
