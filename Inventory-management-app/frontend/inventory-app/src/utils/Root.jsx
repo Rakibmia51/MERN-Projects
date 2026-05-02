@@ -15,7 +15,7 @@ const Root = () => {
             }else if(user.role === "boardMember"){
                 navigate("/boardMember-dashboard")
             }else if(user.role === "member"){
-                namviage("/member-dashboard")
+                navigate("/member-dashboard")
             }else{
                 navigate("/login")
             }

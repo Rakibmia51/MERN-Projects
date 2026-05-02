@@ -17,6 +17,7 @@ import Profile from './components/Profile'
 import MainDashboard from './components/MainDashboard'
 import MemberDashboard from './components/memberComponents/MemberDashboard'
 import MemberShares from './components/memberComponents/MemberShares'
+import MyProfit from './components/memberComponents/MyProfit'
 
 function App() {
   
@@ -161,7 +162,7 @@ function App() {
                 <Route
                   path='profit'
                   element={
-                   <h1>My Profit</h1>
+                   <MyProfit/>
                   }
                 />
 
