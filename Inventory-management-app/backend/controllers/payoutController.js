@@ -24,4 +24,16 @@ const distributeMemberProfits = async (req, res) => {
     }
 };
 
-module.exports = {distributeMemberProfits}
+const getDistributeMemberProfits = async (req, res) =>{
+    try {
+        const profitPayout = await ProfitPayout.find()
+            .populate('projectId', 'projectName')
+            .sort({createdAt: -1})
+
+        res.status(200).json({ success: true, data: profitPayout });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+}
+
+module.exports = {distributeMemberProfits, getDistributeMemberProfits}
