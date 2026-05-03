@@ -1,4 +1,4 @@
-import { HandCoins } from 'lucide-react';
+import { FolderTree, HandCoins } from 'lucide-react';
 import React, { useState, useMemo } from 'react';
 import { 
   FaHome, FaSignOutAlt, FaUserCircle, FaUsers, FaBook, FaChevronDown, FaChevronRight, 
@@ -32,6 +32,7 @@ const Sidebar = () => {
                 { name: "Projects", path: "/admin-dashboard/projects", icon: <FaProjectDiagram /> },
                 { name: "Shares", path: "/admin-dashboard/shares", icon: <FaChartPie /> },
                 { name: "Share Sales", path: "/admin-dashboard/share-sales", icon: <HandCoins size={15}/> },
+                { name: "EndPoint", path: "/admin-dashboard/endpoints", icon: <FolderTree  size={15}/> },
                 { name: "Profit Management", path: "/admin-dashboard/profit", icon: <FaCoins/> },
                 { name: "Reports", path: "/admin-dashboard/reports", icon: <FaFileAlt /> },
             ],
@@ -71,7 +72,7 @@ const Sidebar = () => {
     return (
         <>
             {/* --- TOP HEADER --- */}
-            <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900 border-b border-white/10 z-[60] flex items-center justify-between px-6">
+            <header className="fixed top-0 left-0 right-0 h-16 bg-slate-900 border-b border-white/10 z-[60] flex items-center justify-between px-6 print:hidden">
                 <div className="flex items-center gap-3">
                     <div className="bg-blue-600 p-1.5 rounded-lg">
                         <span className="text-white font-bold text-lg italic px-1">NB</span>
@@ -87,7 +88,7 @@ const Sidebar = () => {
             {/* --- SIDEBAR --- */}
             <aside className={`
                 fixed top-16 left-0 z-50 w-72 h-[calc(100vh-64px)] bg-slate-900 border-r border-white/10 shadow-2xl overflow-y-auto
-                transform transition-transform duration-300 ease-in-out
+                transform transition-transform duration-300 ease-in-out print:hidden
                 ${isMobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
             `}>
                 <nav className="p-4 space-y-2 mt-4">
