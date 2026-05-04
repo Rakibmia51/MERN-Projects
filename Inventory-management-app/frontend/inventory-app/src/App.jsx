@@ -18,6 +18,7 @@ import MainDashboard from './components/MainDashboard'
 import MemberDashboard from './components/memberComponents/MemberDashboard'
 import MemberShares from './components/memberComponents/MemberShares'
 import MyProfit from './components/memberComponents/MyProfit'
+import MyLedger from './components/memberComponents/MyLedger'
 
 function App() {
   
@@ -144,7 +145,7 @@ function App() {
                 <Route
                   path='ledger'
                   element={
-                    <h1>My Ledger</h1>
+                    <MyLedger/>
                   }
                 />
                 <Route
