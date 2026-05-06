@@ -47,8 +47,12 @@ const GlobalInvestmentTable = () => {
     }
   };
 
-  if (loading) return <div className="flex h-screen items-center justify-center">Loading...</div>;
-
+   if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+    </div>
+  );
+  
   const filteredData = allData.filter(item => {
     const matchesType = filterType === 'All' || item.type === filterType;
     const matchesSearch = item.endpointName.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -88,7 +88,11 @@ const projectList = Object.values(projectWiseData || {}).map(item => ({
 }));
   
 
-  if (loading) return <div className="p-10 text-center font-bold">Loading Portfolio...</div>;
+if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+    </div>
+  );
 
   // Average Price Calculation: Total Investment / Total Shares
   const avgPrice = data?.totalShares > 0 ? (data.totalInvestment / data.totalShares) : 0;

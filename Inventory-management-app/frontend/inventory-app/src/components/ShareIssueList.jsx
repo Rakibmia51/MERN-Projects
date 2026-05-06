@@ -146,7 +146,11 @@ const handleSubmit = async (e) => {
     i.projectId?.projectName?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div className="p-10 text-center font-bold text-blue-600">Loading Share Data...</div>;
+   if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+    </div>
+  );
 
   return (
     <div className="p-6 md:p-10 bg-[#f9fafb] min-h-screen">
