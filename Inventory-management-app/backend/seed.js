@@ -12,16 +12,16 @@ const seedAdmin = async ()=>{
         const password = await bcrypt.hash("123456", 10)
 
         await User.create({
-            fullName: "admin-1",
-            mobile: "01712345678", // Matches your BD regex
-            email: "admin1@example.com",
+            fullName: "Rakibul Hasan",
+            mobile: "01859740867", // Matches your BD regex
+            email: "rakib.it.ergon@gmail.com",
             nid: "1234567890123",
-            dateOfBirth: new Date("1995-05-15"),
+            dateOfBirth: new Date("1997-04-12"),
 
             // Family Details
-            fatherName: "Late Abdur Rahman",
-            motherName: "Fatema Begum",
-            spouseName: "Nasrin Akter",
+            fatherName: "Jahangir Alam",
+            motherName: "Ayesha Begum",
+            spouseName: "Nafisa Akter",
             occupation: "Private Service",
             monthlyIncome: 35000,
 
@@ -30,9 +30,9 @@ const seedAdmin = async ()=>{
             permanentAddress: "Village: Sonapur, P.O: Ramganj, Lakshmipur",
 
             // Nominee Details
-            nomineeName: "Nasrin Akter",
+            nomineeName: "Nafisa Akter",
             relation: "Wife",
-            nomineeMobile: "01812345678",
+            nomineeMobile: "01771091032",
 
             // Admission & Roles
             admissionDate: new Date(),

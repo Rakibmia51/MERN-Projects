@@ -78,7 +78,11 @@ const MyLedger = () => {
   const totalInvestment = ledgerData.reduce((sum, item) => sum + item.debit, 0);
   const totalProfit = ledgerData.reduce((sum, item) => sum + item.credit, 0);
 
-  if (loading) return <div className="p-10 text-center font-bold text-indigo-600">Generating Ledger...</div>;
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+    </div>
+  );
 
   return (
     <div className="p-4 md:p-8 bg-gray-50 min-h-screen font-sans">

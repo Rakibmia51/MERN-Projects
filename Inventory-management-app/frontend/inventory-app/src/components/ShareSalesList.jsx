@@ -198,7 +198,11 @@ const ShareSales = () => {
 // end  ডাউনলোড ফাংশন 
 
 
-  if (loading) return <div className="h-screen flex items-center justify-center font-black text-emerald-600 animate-pulse text-xl">Loading Data...</div>;
+   if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-slate-50">
+      <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
+    </div>
+  );
 
   return (
     <div className="p-4 md:p-8 bg-[#f8fafc] min-h-screen">

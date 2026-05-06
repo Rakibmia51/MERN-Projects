@@ -45,8 +45,8 @@ const ProfilePage = () => {
     };
 
     if (!user) return (
-        <div className="flex justify-center items-center h-screen text-xl font-semibold text-blue-600 animate-pulse">
-            Loading Profile...
+        <div className="flex h-screen items-center justify-center bg-slate-50">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-indigo-600"></div>
         </div>
     );
 
